@@ -1,8 +1,8 @@
 package observer
 
 import (
-	"fmt"
 	"marauders-map-client-desktop/tools/string_tools"
+	"strings"
 )
 
 // ===========================================
@@ -39,8 +39,10 @@ type KeyloggerObserver struct {
 
 func (o *KeyloggerObserver) execute(m string) {
 	m = string_tools.CleanWhiteSpaces(m)
-	fmt.Printf("%q KLObserver - message received:\n", m)
 	o.Msg = m
+
+	ms := strings.Split(m, " ")
+	_ = ms
 }
 
 func NewKeyloggerObserver() *KeyloggerObserver {
