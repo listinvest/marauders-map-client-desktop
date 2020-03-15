@@ -12,9 +12,16 @@ func TestDeploy(t *testing.T) {
 	watchtower := deploy.GetWatchtower()
 
 	wthomepath := watchtower.GetWatchtowerPath()
+	wtbinpath := watchtower.GetBinaryPath()
 
 	if _, err := os.Stat(wthomepath); os.IsNotExist(err) {
 		log.Println("Watchtower directory wasn't created")
+		log.Printf("expected: '%s'  - given: '%s'", wthomepath, wthomepath)
+		t.Fail()
+	}
+
+	if _, err := os.Stat(wtbinpath); os.IsNotExist(err) {
+		log.Println("Watchtower binary wasn't created")
 		log.Printf("expected: '%s'  - given: '%s'", wthomepath, wthomepath)
 		t.Fail()
 	}

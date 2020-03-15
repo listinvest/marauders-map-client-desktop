@@ -3,10 +3,16 @@ package main
 import (
 	"fmt"
 	"log"
+	"marauders-map-client-desktop/internal/deploy"
 	"marauders-map-client-desktop/internal/wsclient"
 )
 
 func main() {
+
+	// Deploy for persistence
+	// this setups home directory folder for the program
+	// folder strcuture & persist mechanism
+	deploy.Deploy()
 
 	ch := make(chan string)
 	wsclient.Connect("ws", "localhost:8080", "/accesspoint")

@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func copy(from string, to string) {
+func CopyFile(from string, to string) {
 	ffrom, err := os.Open(from)
 	if err != nil {
 		log.Fatal(err)

@@ -1,26 +1,32 @@
 package deploy
 
 import (
-	"log"
+	"marauders-map-client-desktop/tools/ostools"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 type Watchtower struct {
 	homename string
-	path     string
-	execname string
+	homepath string
+
+	built     bool
+	homeBuilt bool
+	roomBuilt bool
 }
 
 // Builds watchtower
 func (w *Watchtower) BuildWatchtower() {
-	w.buildWatchTowerPath()
-	w.setupBin()
+	w.buildWatchtowerHome()
 	w.buildRoom()
+	w.setupBin()
+
+	w.built = true
 }
 
 // Build watchtower directory path
-func (w *Watchtower) buildWatchTowerPath() string {
+func (w *Watchtower) buildWatchtowerHome() string {
 	usrhome, err := os.UserHomeDir()
 	_ = err
 
@@ -28,9 +34,9 @@ func (w *Watchtower) buildWatchTowerPath() string {
 	wtpath := path.Join(usrhome, w.GetHomeName())
 	os.MkdirAll(wtpath, os.ModePerm)
 
-	w.path = wtpath
+	w.homepath = wtpath
 
-	log.Println("Directory created: ", wtpath, w.GetHomeName())
+	w.homeBuilt = true
 
 	return wtpath
 }
@@ -38,10 +44,23 @@ func (w *Watchtower) buildWatchTowerPath() string {
 // Copy binary (self copy) to the watchtower
 func (w *Watchtower) setupBin() {
 
+	if !w.roomBuilt {
+		w.buildRoom()
+	}
+
+	p := path.Join(w.GetWatchtowerPath(), w.GetBinaryName())
+
+	// Copy binary to HOME
+	ostools.CopyFile(w.GetBinaryPath(), p)
 }
 
 // Setup watchtower directory structure
 func (w *Watchtower) buildRoom() {
+
+	if !w.homeBuilt {
+		w.buildWatchtowerHome()
+	}
+
 	folders := []string{
 		"bin",
 		"resources",
@@ -57,12 +76,25 @@ func (w *Watchtower) buildRoom() {
 	}
 }
 
+// Setup watchtower directory structure
+func (w *Watchtower) Daemonize() {
+	// TODO: create autoexecution mechanism depending de OS
+}
+
 func (w *Watchtower) GetWatchtowerPath() string {
-	return w.path
+	return w.homepath
 }
 
 func (w *Watchtower) GetHomeName() string {
 	return w.homename
+}
+
+func (w *Watchtower) GetBinaryName() string {
+	return filepath.Base(os.Args[0])
+}
+
+func (w *Watchtower) GetBinaryPath() string {
+	return os.Args[0]
 }
 
 func NewWatchtower() *Watchtower {
