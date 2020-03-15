@@ -12,9 +12,6 @@ func main() {
 	// deploy.Deploy()
 
 	// Start connection and communication with server
-	ch := make(chan string) // Channel that receives messages from the server
-	wsclient.StartCommunications(ch)
+	wsclient.StartCommunications()
 
-	for {
-	}
 }

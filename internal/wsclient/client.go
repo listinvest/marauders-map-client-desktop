@@ -71,7 +71,9 @@ func StartReadsMessages(ch chan string) {
 
 // Entrypoint for starting communications with Server
 // via websockets
-func StartCommunications(ch chan string) {
+func StartCommunications() {
+	ch := make(chan string)
+
 	Connect("ws", "localhost:8080", "/accesspoint")
 
 	StartReadsMessages(ch)
