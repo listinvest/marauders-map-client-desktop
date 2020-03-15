@@ -37,6 +37,7 @@ func (w *Watchtower) buildWatchTowerPath() string {
 
 // Copy binary (self copy) to the watchtower
 func (w *Watchtower) setupBin() {
+
 }
 
 // Setup watchtower directory structure
