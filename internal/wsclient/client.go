@@ -1,6 +1,7 @@
 package wsclient
 
 import (
+	"fmt"
 	"log"
 	"net/url"
 
@@ -62,9 +63,35 @@ func StartReadsMessages(ch chan string) {
 				break
 			}
 
-			log.Printf("Received message: %s", message)
 			ch <- string(message)
 		}
 
 	}(ch)
+}
+
+// Entrypoint for starting communications with Server
+// via websockets
+func StartCommunications(ch chan string) {
+	Connect("ws", "localhost:8080", "/accesspoint")
+
+	StartReadsMessages(ch)
+
+	for {
+		data, ok := <-ch
+		if !ok {
+			log.Println("Connection closed!")
+			break
+		}
+
+		log.Printf("Message Received: %s", data)
+
+		thanksmsg := fmt.Sprintf("Thank you! ...for your message: \"%s\"", data)
+		err := SendMessage(thanksmsg)
+		if err != nil {
+			log.Printf("ERROR sending message: %s", data)
+			log.Printf("ERROR reason: %s", err)
+		}
+
+		log.Printf("Message Sent: %s", thanksmsg)
+	}
 }
