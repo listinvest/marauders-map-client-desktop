@@ -21,7 +21,12 @@ func main() {
 		}
 
 		println("Received: ", data)
-		wsclient.SendMessage(fmt.Sprintf("I received: %s", data))
+
+		err := wsclient.SendMessage(fmt.Sprintf("I received: %s", data))
+		if err != nil {
+			log.Printf("ERROR sending message: %s", data)
+			log.Printf("ERROR reason: %s", err)
+		}
 	}
 
 }

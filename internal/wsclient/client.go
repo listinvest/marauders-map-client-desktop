@@ -38,12 +38,12 @@ func Disconnect() {
 /*
  * Writes message to the socket
  */
-func SendMessage(msg string) {
+func SendMessage(msg string) error {
 	if conn == nil || !connected {
 		panic("WebSocket Connection needed!")
 	}
 
-	conn.WriteMessage(websocket.TextMessage, []byte(msg))
+	return conn.WriteMessage(websocket.TextMessage, []byte(msg))
 }
 
 /*
@@ -58,11 +58,11 @@ func StartReadsMessages(ch chan string) {
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
-				log.Println("Read ERR:", err)
+				log.Println("Read ERROR:", err)
 				break
 			}
 
-			log.Printf("Recv: %s", message)
+			log.Printf("Received message: %s", message)
 			ch <- string(message)
 		}
 
