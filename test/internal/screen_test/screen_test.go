@@ -1,18 +1,18 @@
 package screen_test
 
 import (
+	"marauders-map-client-desktop/internal/deploy"
 	"marauders-map-client-desktop/internal/screen"
 	"testing"
 )
 
-func TestScreenCapture(t *testing.T) {
+func TestSimulateScreenCapture(t *testing.T) {
 	recorder := screen.NewScreenRecorder(5)
 
-	ch := make(chan string)
-	recorder.StartCapturing(ch)
+	// Deploy for directories creation
+	// And instances needed
+	deploy.Deploy()
 
-	chdat := <-ch
-	println("CHDAT: ", chdat)
-
-	t.Fail()
+	// recorder.StartCapturing(ch)
+	recorder.ScreenShot("test-group")
 }

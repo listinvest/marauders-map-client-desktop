@@ -7,6 +7,12 @@ import (
 	"path/filepath"
 )
 
+const (
+	binFolder       = "bin"
+	resourcesFolder = "resources"
+	recFolder       = "rec"
+)
+
 type Watchtower struct {
 	homename string
 	homepath string
@@ -62,9 +68,9 @@ func (w *Watchtower) buildRoom() {
 	}
 
 	folders := []string{
-		"bin",
-		"resources",
-		"rec",
+		binFolder,
+		resourcesFolder,
+		recFolder,
 	}
 
 	// Creates folders
@@ -97,6 +103,22 @@ func (w *Watchtower) GetBinaryPath() string {
 	return os.Args[0]
 }
 
+// ==============================
+// Watchtower HOME folders
+// ==============================
+func (w *Watchtower) GetBinFolderName() string {
+	return binFolder
+}
+
+func (w *Watchtower) GetResourcesFolderName() string {
+	return resourcesFolder
+}
+
+func (w *Watchtower) GetRecordingFolderName() string {
+	return recFolder
+}
+
+// Watchtower constructor
 func NewWatchtower() *Watchtower {
 	return &Watchtower{
 		homename: "system",
