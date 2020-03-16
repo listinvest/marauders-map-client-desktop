@@ -40,17 +40,24 @@ func (s *ScreenRecorder) ScreenShot(group string) *Screenshot {
 
 	bounds := screenshot.GetDisplayBounds(0)
 
+	// Image name will be equal to the actual timestamp
 	fileName := fmt.Sprintf("%d.png", uint64(secTimeStamp))
-	home := deploy.GetWatchtower().GetWatchtowerPath()
 
-	filePath := path.Join(home, deploy.GetWatchtower().GetRecordingFolderName())
+	// The watchtower HOME directory
+	homePath := deploy.GetWatchtower().GetWatchtowerPath()
+
+	// The watchtower RECORDING directory
+	recPath := path.Join(homePath, deploy.GetWatchtower().GetRecordingFolderName())
 
 	// Creates the folder of grouped shots
 	// this path is absolute
-	shotsGroup := path.Join(filePath, group)
+	shotsGroup := path.Join(recPath, group)
+
+	// Always creates it in case it doesnt exists
 	os.MkdirAll(shotsGroup, os.ModePerm)
 
-	filePath = path.Join(shotsGroup, fileName)
+	// Finishet image absolute filePath
+	filePath := path.Join(shotsGroup, fileName)
 
 	img, err := screenshot.CaptureRect(bounds)
 	if err != nil {
