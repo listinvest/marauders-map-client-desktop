@@ -114,10 +114,14 @@ func (s *ScreenRecorder) saveImage(img *image.RGBA, filepath string) {
 // Starts a decoupled Goroutine for recording all
 // the monitors detected
 func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
-
+	s.mux.Lock()
 	if s.recording {
+		s.mux.Unlock()
 		return
 	}
+	s.mux.Unlock()
+
+	log.Println("Inside StartCapturing()")
 
 	go func() {
 		s.mux.Lock()
@@ -133,13 +137,15 @@ func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
 
 			s.mux.Lock()
 			if !s.recording {
+				s.mux.Unlock()
 				break
 			}
 			s.mux.Unlock()
 
 			ch <- shot
 
-			time.Sleep(time.Duration(s.secondsPerShot) * time.Second)
+			time.Sleep(time.Duration(3) * time.Second)
+			// time.Sleep(time.Duration(s.secondsPerShot) * time.Second)
 		}
 	}()
 }
