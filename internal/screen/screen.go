@@ -131,9 +131,11 @@ func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
 		for {
 			shot := s.ScreenShot(timestamp)
 
+			s.mux.Lock()
 			if !s.recording {
 				break
 			}
+			s.mux.Unlock()
 
 			ch <- shot
 
