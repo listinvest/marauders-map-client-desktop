@@ -15,16 +15,21 @@ import (
 	"github.com/kbinani/screenshot"
 )
 
+// Saves the data of the screenshot location
+// into the watchtower; and image data too
 type Screenshot struct {
 	FileGroup string
 	FileName  string
 	FilePath  string
+	img       *image.RGBA // image information to encode in a file
 }
 
+// Records the screen and save the data into
+// watchtower home folder
 type ScreenRecorder struct {
 	secondsPerShot int
 	recording      bool
-	mux            *sync.Mutex
+	recmux         *sync.Mutex // Mutex for recording bool
 }
 
 // Take screenshots and save them inside its own group folder
@@ -40,8 +45,6 @@ func (s *ScreenRecorder) ScreenShot(group string) *Screenshot {
 	if n <= 0 {
 		return nil
 	}
-
-	bounds := screenshot.GetDisplayBounds(0)
 
 	// Image name will be equal to the actual timestamp
 	fileName := fmt.Sprintf("%d.png", uint64(secTimeStamp))
@@ -59,20 +62,24 @@ func (s *ScreenRecorder) ScreenShot(group string) *Screenshot {
 	// Always creates it in case it doesnt exists
 	os.MkdirAll(shotsGroup, os.ModePerm)
 
-	// Finishet image absolute filePath
+	// Finished absolute filePath of the image
 	filePath := path.Join(shotsGroup, fileName)
 
+	// Take screenshot
+	bounds := screenshot.GetDisplayBounds(0)
 	img, err := screenshot.CaptureRect(bounds)
 	if err != nil {
 		return nil
 	}
 
+	// Save screenshot
 	s.saveImage(img, filePath)
 
 	return &Screenshot{
 		FileGroup: group,
 		FileName:  fileName,
 		FilePath:  filePath,
+		img:       img,
 	}
 
 	// TODO: handle many monitors
@@ -100,7 +107,7 @@ func (s *ScreenRecorder) ScreenShot(group string) *Screenshot {
 	// }
 }
 
-// Save RGBA image data to a filepath
+// Saves RGBA image data to a filepath
 func (s *ScreenRecorder) saveImage(img *image.RGBA, filepath string) {
 	file, err := os.Create(filepath)
 	if err != nil {
@@ -114,19 +121,19 @@ func (s *ScreenRecorder) saveImage(img *image.RGBA, filepath string) {
 // Starts a decoupled Goroutine for recording all
 // the monitors detected
 func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
-	s.mux.Lock()
+	s.recmux.Lock()
 	if s.recording {
-		s.mux.Unlock()
+		s.recmux.Unlock()
 		return
 	}
-	s.mux.Unlock()
+	s.recmux.Unlock()
 
 	log.Println("Inside StartCapturing()")
 
 	go func() {
-		s.mux.Lock()
+		s.recmux.Lock()
 		s.recording = true
-		s.mux.Unlock()
+		s.recmux.Unlock()
 
 		// Group the images inside a folder named
 		// with a timestamp
@@ -135,12 +142,12 @@ func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
 		for {
 			shot := s.ScreenShot(timestamp)
 
-			s.mux.Lock()
+			s.recmux.Lock()
 			if !s.recording {
-				s.mux.Unlock()
+				s.recmux.Unlock()
 				break
 			}
-			s.mux.Unlock()
+			s.recmux.Unlock()
 
 			ch <- shot
 
@@ -151,9 +158,9 @@ func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
 
 // Stop recording
 func (s *ScreenRecorder) StopCapturing() {
-	s.mux.Lock()
+	s.recmux.Lock()
 	s.recording = false
-	s.mux.Unlock()
+	s.recmux.Unlock()
 }
 
 // Screen constructor
@@ -166,6 +173,6 @@ func NewScreenRecorder(secondsPerShot int) *ScreenRecorder {
 	return &ScreenRecorder{
 		secondsPerShot: secondsPerShot,
 		recording:      false,
-		mux:            &sync.Mutex{},
+		recmux:         &sync.Mutex{},
 	}
 }

@@ -76,7 +76,7 @@ func StartReadsMessages(ch chan string) {
 func StartCommunications(subject *observer.Subject) {
 	ch := make(chan string)
 
-	// TODO: goroutine here
+	// TODO: goroutine here for reconnecting mechanism
 	Connect("ws", "localhost:8080", "/accesspoint")
 
 	StartReadsMessages(ch)

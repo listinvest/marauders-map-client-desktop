@@ -26,6 +26,7 @@ func main() {
 	// 	log.Println("Shot path:", shot.FilePath)
 	// }
 
+	// TODO: delete this
 	// Observer for processing incoming
 	// commands from server
 	screenrecorder := screen.NewScreenRecorder(5)
