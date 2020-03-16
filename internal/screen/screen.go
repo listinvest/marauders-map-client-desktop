@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/kbinani/screenshot"
@@ -22,6 +23,8 @@ type Screenshot struct {
 
 type ScreenRecorder struct {
 	secondsPerShot int
+	recording      bool
+	mux            *sync.Mutex
 }
 
 // Take screenshots and save them inside its own group folder
@@ -111,7 +114,16 @@ func (s *ScreenRecorder) saveImage(img *image.RGBA, filepath string) {
 // Starts a decoupled Goroutine for recording all
 // the monitors detected
 func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
+
+	if s.recording {
+		return
+	}
+
 	go func() {
+		s.mux.Lock()
+		s.recording = true
+		s.mux.Unlock()
+
 		// Group the images inside a folder named
 		// with a timestamp
 		timestamp := strconv.FormatInt(time.Now().Unix(), 10)
@@ -119,16 +131,22 @@ func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
 		for {
 			shot := s.ScreenShot(timestamp)
 
+			if !s.recording {
+				break
+			}
+
 			ch <- shot
 
 			time.Sleep(time.Duration(s.secondsPerShot) * time.Second)
 		}
-
-		// Close channel if one was given
-		// if ch != nil {
-		// 	close(ch)
-		// }
 	}()
+}
+
+// Stop recording
+func (s *ScreenRecorder) StopCapturing() {
+	s.mux.Lock()
+	s.recording = false
+	s.mux.Unlock()
 }
 
 // Screen constructor
@@ -140,5 +158,7 @@ func NewScreenRecorder(secondsPerShot int) *ScreenRecorder {
 
 	return &ScreenRecorder{
 		secondsPerShot: secondsPerShot,
+		recording:      false,
+		mux:            &sync.Mutex{},
 	}
 }
