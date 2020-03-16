@@ -144,8 +144,7 @@ func (s *ScreenRecorder) StartCapturing(ch chan *Screenshot) {
 
 			ch <- shot
 
-			time.Sleep(time.Duration(3) * time.Second)
-			// time.Sleep(time.Duration(s.secondsPerShot) * time.Second)
+			time.Sleep(time.Duration(s.secondsPerShot) * time.Second)
 		}
 	}()
 }
