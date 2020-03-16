@@ -4,7 +4,6 @@ import "log"
 
 // KeyLogger commands Observer
 type KeyloggerCmdObserver struct {
-	Msg string
 }
 
 func (o *KeyloggerCmdObserver) execute(cmd string, data []string) {

