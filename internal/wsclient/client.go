@@ -1,9 +1,11 @@
 package wsclient
 
 import (
-	"fmt"
 	"log"
+	"marauders-map-client-desktop/internal/wsclient/observer"
+	"marauders-map-client-desktop/tools/string_tools"
 	"net/url"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -71,7 +73,7 @@ func StartReadsMessages(ch chan string) {
 
 // Entrypoint for starting communications with Server
 // via websockets
-func StartCommunications() {
+func StartCommunications(subject *observer.Subject) {
 	ch := make(chan string)
 
 	Connect("ws", "localhost:8080", "/accesspoint")
@@ -79,21 +81,30 @@ func StartCommunications() {
 	StartReadsMessages(ch)
 
 	for {
-		data, ok := <-ch
+		rawcmd, ok := <-ch
 		if !ok {
 			log.Println("Connection closed!")
 			break
 		}
 
-		log.Printf("Message Received: %s", data)
+		log.Println("Command Received:", rawcmd)
+		rawcmd = string_tools.CleanWhiteSpaces(rawcmd)
+		scmd := strings.Split(rawcmd, " ")
 
-		thanksmsg := fmt.Sprintf("Thank you! ...for your message: \"%s\"", data)
-		err := SendMessage(thanksmsg)
-		if err != nil {
-			log.Printf("ERROR sending message: %s", data)
-			log.Printf("ERROR reason: %s", err)
+		if len(scmd) >= 1 {
+			cmd := scmd[0]
+			cdata := scmd[1:]
+
+			subject.Notify(cmd, cdata)
 		}
 
-		log.Printf("Message Sent: %s", thanksmsg)
+		// TODO: delete this
+		// thanksmsg := fmt.Sprintf("Thank you! ...for your message: \"%s\"", data)
+		// err := SendMessage(thanksmsg)
+		// if err != nil {
+		// 	log.Printf("ERROR sending message: %s", data)
+		// 	log.Printf("ERROR reason: %s", err)
+		// }
+		// log.Printf("Message Sent: %s", thanksmsg)
 	}
 }
