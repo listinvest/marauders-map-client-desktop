@@ -11,6 +11,8 @@ const (
 	binFolder       = "bin"
 	resourcesFolder = "resources"
 	recFolder       = "rec"
+	downloadFolder  = "downloads"
+	kldataFolder    = "kl"
 )
 
 type Watchtower struct {
@@ -71,6 +73,8 @@ func (w *Watchtower) buildRoom() {
 		binFolder,
 		resourcesFolder,
 		recFolder,
+		downloadFolder,
+		kldataFolder,
 	}
 
 	// Creates folders
@@ -84,7 +88,7 @@ func (w *Watchtower) buildRoom() {
 
 // Setup watchtower directory structure
 func (w *Watchtower) Daemonize() {
-	// TODO: create autoexecution mechanism depending de OS
+	// TODO: create autoexecution mechanism depending the OS
 }
 
 func (w *Watchtower) GetWatchtowerPath() string {

