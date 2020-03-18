@@ -10,13 +10,40 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var conn *websocket.Conn
-var connected bool
+type WSClient struct {
+	// ====================
+	// Websocket URL
+	// ====================
+	WSConfiguration
+
+	// ====================
+	// HTTP Address
+	// ====================
+	HTTPConfiguration
+}
+
+type WSConfiguration struct {
+	Wsscheme string
+	Wshost   string
+	Wsport   string
+	Wspath   string
+
+	conn      *websocket.Conn
+	connected bool
+}
+
+type HTTPConfiguration struct {
+	httpprotocol string
+	httpdomain   string
+	httpport     string
+
+	uploaduri string // Server URI for uploading files
+}
 
 /**
  * Connects to WebSocket Server
  */
-func Connect(scheme string, host string, path string) {
+func (wsc *WSClient) Connect(scheme string, host string, path string) {
 	u := url.URL{Scheme: scheme, Host: host, Path: path}
 
 	log.Printf("Connecting to '%s'", u.String())
@@ -26,40 +53,40 @@ func Connect(scheme string, host string, path string) {
 		log.Fatal("Dial: ", err)
 	}
 
-	conn = c
-	connected = true
+	wsc.conn = c
+	wsc.connected = true
 }
 
 /*
  * Disconnects from WebSocket server
  */
-func Disconnect() {
+func (wsc *WSClient) Disconnect() {
 	log.Println("Closing websocket connection")
-	conn.Close()
+	wsc.conn.Close()
 }
 
 /*
  * Writes message to the socket
  */
-func SendMessage(msg string) error {
-	if conn == nil || !connected {
+func (wsc *WSClient) SendMessage(msg string) error {
+	if wsc.conn == nil || !wsc.connected {
 		panic("WebSocket Connection needed!")
 	}
 
-	return conn.WriteMessage(websocket.TextMessage, []byte(msg))
+	return wsc.conn.WriteMessage(websocket.TextMessage, []byte(msg))
 }
 
 /*
  * Reads incoming messages from the socket
  */
-func StartReadsMessages(ch chan string) {
+func (wsc *WSClient) StartReadsMessages(ch chan string) {
 
 	// Start decoupled Goroutine for reading messages
 	go func(ch chan string) {
 		defer close(ch)
 
 		for {
-			_, message, err := conn.ReadMessage()
+			_, message, err := wsc.conn.ReadMessage()
 			if err != nil {
 				log.Println("Read ERROR:", err)
 				break
@@ -73,13 +100,13 @@ func StartReadsMessages(ch chan string) {
 
 // Entrypoint for starting communications with Server
 // via websockets
-func StartCommunications(subject *observer.Subject) {
+func (wsc *WSClient) StartCommunications(subject *observer.Subject) {
 	ch := make(chan string)
 
 	// TODO: goroutine here for reconnecting mechanism
-	Connect("ws", "localhost:8080", "/accesspoint")
+	wsc.Connect("ws", "localhost:8080", "/accesspoint")
 
-	StartReadsMessages(ch)
+	wsc.StartReadsMessages(ch)
 
 	for {
 		rawcmd, ok := <-ch
@@ -107,5 +134,31 @@ func StartCommunications(subject *observer.Subject) {
 		// 	log.Printf("ERROR reason: %s", err)
 		// }
 		// log.Printf("Message Sent: %s", thanksmsg)
+	}
+}
+
+func NewWSClient(wsconf WSConfiguration, httpconf HTTPConfiguration) *WSClient {
+	return &WSClient{
+		WSConfiguration:   wsconf,
+		HTTPConfiguration: httpconf,
+	}
+}
+
+func NewWSConfiguration(scheme, host, port, path string) WSConfiguration {
+	return WSConfiguration{
+		Wsscheme: scheme,
+		Wshost:   host,
+		Wsport:   port,
+		Wspath:   path,
+	}
+}
+
+func NewHTTPConfiguration(httpprotocol, httpdomain, httpport, uploaduri string) HTTPConfiguration {
+	return HTTPConfiguration{
+		httpprotocol: httpprotocol,
+		httpdomain:   httpdomain,
+		httpport:     httpport,
+
+		uploaduri: uploaduri,
 	}
 }
