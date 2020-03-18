@@ -28,11 +28,20 @@ func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
 			return
 		}
 
-		if data[1] == "start" {
+		action := data[1]
+
+		switch action {
+		case "start":
+			// Starts recording in a folder
 			o.startRecording()
 			return
-		} else if data[1] == "stop" {
+		case "stop":
+			// Stops recording
 			o.stopRecording()
+			return
+		case "shot":
+			// Take a Screenshot and send it back
+			o.shot()
 			return
 		}
 
@@ -55,6 +64,15 @@ func (o *ScreenshotCmdObserver) startRecording() {
 
 func (o *ScreenshotCmdObserver) stopRecording() {
 	o.recorder.StopCapturing()
+}
+
+func (o *ScreenshotCmdObserver) shot() {
+	// Set 'tmp' as group for the folder
+	shot := o.recorder.ScreenShot("tmp")
+	filepath := shot.FilePath
+	_ = filepath
+
+	// TODO: send the file back
 }
 
 func NewScreenshotCmdObserver(recorder *screen.ScreenRecorder) *ScreenshotCmdObserver {
