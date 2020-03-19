@@ -81,6 +81,8 @@ func (o *SendFileCmdObserver) downloadFile(url string) error {
 
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
+
+	log.Printf("File %s downloaded\n", url)
 	return err
 }
 
