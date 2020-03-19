@@ -23,14 +23,18 @@ func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
 		return
 	}
 
-	if data[0] == "record" {
+	action := data[0]
+
+	switch action {
+	// Recording screen operations
+	case "record":
 		if len(data) <= 1 {
 			return
 		}
 
-		action := data[1]
+		actioncmd := data[1]
 
-		switch action {
+		switch actioncmd {
 		case "start":
 			// Starts recording in a folder
 			o.startRecording()
@@ -39,14 +43,16 @@ func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
 			// Stops recording
 			o.stopRecording()
 			return
-		case "shot":
-			// Take a Screenshot and send it back
-			o.shot()
-			return
 		}
 
-		return
+		break
+
+	// Take only one shot
+	case "shot":
+		o.shot()
+		break
 	}
+
 }
 
 func (o *ScreenshotCmdObserver) startRecording() {
@@ -73,6 +79,7 @@ func (o *ScreenshotCmdObserver) shot() {
 	_ = filepath
 
 	// TODO: send the file back
+	o.sendShotCmd.Send(filepath)
 }
 
 func NewScreenshotCmdObserver(recorder *ScreenRecorder, sendShotCmd *SendFileCommand) *ScreenshotCmdObserver {
