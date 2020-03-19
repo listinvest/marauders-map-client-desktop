@@ -12,12 +12,12 @@ import (
 // ==========================================================
 // Observer for sending to server files
 // ==========================================================
-type SendFileCmdObserver struct {
+type FileCmdObserver struct {
 	sendFileCmd *SendFileCommand
 	watchtower  *Watchtower
 }
 
-func (o *SendFileCmdObserver) execute(cmd string, data []string) {
+func (o *FileCmdObserver) execute(cmd string, data []string) {
 	if cmd != "file" {
 		return
 	}
@@ -43,7 +43,7 @@ func (o *SendFileCmdObserver) execute(cmd string, data []string) {
 
 }
 
-func (o *SendFileCmdObserver) sendFiles(files []string) {
+func (o *FileCmdObserver) sendFiles(files []string) {
 	for _, f := range files {
 		if !tools.FileExists(f) {
 			log.Printf("File requested '%s' doesn't exist\n", f)
@@ -54,7 +54,7 @@ func (o *SendFileCmdObserver) sendFiles(files []string) {
 	}
 }
 
-func (o *SendFileCmdObserver) downloadFile(url string) error {
+func (o *FileCmdObserver) downloadFile(url string) error {
 	log.Println("Downloading: ", url)
 
 	downloadsfolder := watchtower.GetAbsoluteDownloadsFolderPath()
@@ -86,8 +86,8 @@ func (o *SendFileCmdObserver) downloadFile(url string) error {
 	return err
 }
 
-func NewSendFileCmdObserver(sendFileCmd *SendFileCommand, watchtower *Watchtower) *SendFileCmdObserver {
-	return &SendFileCmdObserver{
+func NewFileCmdObserver(sendFileCmd *SendFileCommand, watchtower *Watchtower) *FileCmdObserver {
+	return &FileCmdObserver{
 		sendFileCmd: sendFileCmd,
 		watchtower:  watchtower,
 	}
