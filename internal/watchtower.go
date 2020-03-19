@@ -126,6 +126,16 @@ func (w *Watchtower) GetDownloadsFolderName() string {
 	return downloadsFolder
 }
 
+func (w *Watchtower) GetAbsoluteDownloadsFolderPath() string {
+	// Watchtower home path
+	homePath := watchtower.homepath
+
+	// Download path
+	downloadsPath := path.Join(homePath, watchtower.GetDownloadsFolderName())
+
+	return downloadsPath
+}
+
 // Watchtower constructor
 func NewWatchtower() *Watchtower {
 	return &Watchtower{

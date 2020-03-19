@@ -57,17 +57,11 @@ func (o *SendFileCmdObserver) sendFiles(files []string) {
 func (o *SendFileCmdObserver) downloadFile(url string) error {
 	log.Println("Downloading: ", url)
 
-	downloadsfolder := watchtower.GetDownloadsFolderName()
+	downloadsfolder := watchtower.GetAbsoluteDownloadsFolderPath()
 	filename := tools.ExtractFileNameFromURL(url)
 
-	// Watchtower home path
-	homePath := watchtower.homepath
-
-	// Download path
-	downloadsPath := path.Join(homePath, downloadsfolder)
-
 	// Absolute filePath
-	finalFilePath := path.Join(downloadsPath, filename)
+	finalFilePath := path.Join(downloadsfolder, filename)
 
 	// Get the data
 	resp, err := http.Get(url)
