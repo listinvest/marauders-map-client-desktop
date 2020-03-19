@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 )
 
 func CopyFile(from string, to string) {
@@ -31,4 +32,19 @@ func FileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func ExtractFileNameFromURL(url string) string {
+	urls := strings.Split(url, "/")
+
+	if len(urls) <= 0 {
+		return ""
+	}
+
+	filename := urls[len(urls)-1]
+	if filename == "" {
+		return ""
+	}
+
+	return filename
 }

