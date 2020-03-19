@@ -2,9 +2,7 @@ package internal
 
 import (
 	"log"
-	"marauders-map-client-desktop/tools"
 	"net/url"
-	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -114,16 +112,19 @@ func (wsc *WSClient) StartCommunications(subject *Subject) {
 			break
 		}
 
-		log.Println("Command Received:", rawcmd)
-		rawcmd = tools.CleanWhiteSpaces(rawcmd)
-		scmd := strings.Split(rawcmd, " ")
+		_ = rawcmd
 
-		if len(scmd) >= 1 {
-			cmd := scmd[0]
-			cdata := scmd[1:]
+		// TODO: change by JSON
+		// log.Println("Command Received:", rawcmd)
+		// rawcmd = tools.CleanWhiteSpaces(rawcmd)
+		// scmd := strings.Split(rawcmd, " ")
 
-			subject.Notify(cmd, cdata)
-		}
+		// if len(scmd) >= 1 {
+		// 	cmd := scmd[0]
+		// 	cdata := scmd[1:]
+
+		// 	subject.Notify(cmd, cdata)
+		// }
 
 		// TODO: delete this
 		// thanksmsg := fmt.Sprintf("Thank you! ...for your message: \"%s\"", data)
