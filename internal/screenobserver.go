@@ -8,6 +8,7 @@ import (
 type ScreenshotCmdObserver struct {
 	recorder         *ScreenRecorder
 	recordingChannel chan *Screenshot
+	sendShotCmd      *SendFileCommand
 }
 
 func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
@@ -74,8 +75,9 @@ func (o *ScreenshotCmdObserver) shot() {
 	// TODO: send the file back
 }
 
-func NewScreenshotCmdObserver(recorder *ScreenRecorder) *ScreenshotCmdObserver {
+func NewScreenshotCmdObserver(recorder *ScreenRecorder, sendShotCmd *SendFileCommand) *ScreenshotCmdObserver {
 	return &ScreenshotCmdObserver{
-		recorder: recorder,
+		recorder:    recorder,
+		sendShotCmd: sendShotCmd,
 	}
 }

@@ -1,14 +1,12 @@
 package internal
 
-// ===========================================
-// Command Interface
-// Define Command implementations for answering to the server
-// ===========================================
-type ResponseCommand interface {
-	execute()
-}
-
 type SendFileCommand struct {
 	AbsolutePath string
 	wsc          *WSClient
+}
+
+func NewSendFileCommand(wsc *WSClient) *SendFileCommand {
+	return &SendFileCommand{
+		wsc: wsc,
+	}
 }
