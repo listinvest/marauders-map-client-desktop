@@ -22,10 +22,10 @@ type WSClient struct {
 }
 
 type WSConfiguration struct {
-	Wsscheme string
-	Wshost   string
-	Wsport   string
-	Wspath   string
+	wsscheme string
+	wshost   string
+	wsport   string
+	wspath   string
 
 	conn      *websocket.Conn
 	connected bool
@@ -145,10 +145,10 @@ func NewWSClient(wsconf WSConfiguration, httpconf HTTPConfiguration) *WSClient {
 
 func NewWSConfiguration(scheme, host, port, path string) WSConfiguration {
 	return WSConfiguration{
-		Wsscheme: scheme,
-		Wshost:   host,
-		Wsport:   port,
-		Wspath:   path,
+		wsscheme: scheme,
+		wshost:   host,
+		wsport:   port,
+		wspath:   path,
 	}
 }
 
