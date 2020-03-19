@@ -1,4 +1,4 @@
-package string_tools
+package tools
 
 import "strings"
 

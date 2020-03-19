@@ -1,11 +1,10 @@
-package screen
+package internal
 
 import (
 	"fmt"
 	"image"
 	"image/png"
 	"log"
-	"marauders-map-client-desktop/internal/deploy"
 	"os"
 	"path"
 	"strconv"
@@ -50,10 +49,10 @@ func (s *ScreenRecorder) ScreenShot(group string) *Screenshot {
 	fileName := fmt.Sprintf("%d.png", uint64(secTimeStamp))
 
 	// The watchtower HOME directory
-	homePath := deploy.GetWatchtower().GetWatchtowerPath()
+	homePath := GetWatchtower().GetWatchtowerPath()
 
 	// The watchtower RECORDING directory
-	recPath := path.Join(homePath, deploy.GetWatchtower().GetRecordingFolderName())
+	recPath := path.Join(homePath, GetWatchtower().GetRecordingFolderName())
 
 	// Creates the folder of grouped shots
 	// this path is absolute

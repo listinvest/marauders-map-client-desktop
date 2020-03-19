@@ -1,9 +1,8 @@
-package wsclient
+package internal
 
 import (
 	"log"
-	"marauders-map-client-desktop/internal/wsclient/observer"
-	"marauders-map-client-desktop/tools/string_tools"
+	"marauders-map-client-desktop/tools"
 	"net/url"
 	"strings"
 
@@ -100,7 +99,7 @@ func (wsc *WSClient) StartReadsMessages(ch chan string) {
 
 // Entrypoint for starting communications with Server
 // via websockets
-func (wsc *WSClient) StartCommunications(subject *observer.Subject) {
+func (wsc *WSClient) StartCommunications(subject *Subject) {
 	ch := make(chan string)
 
 	// TODO: goroutine here for reconnecting mechanism
@@ -116,7 +115,7 @@ func (wsc *WSClient) StartCommunications(subject *observer.Subject) {
 		}
 
 		log.Println("Command Received:", rawcmd)
-		rawcmd = string_tools.CleanWhiteSpaces(rawcmd)
+		rawcmd = tools.CleanWhiteSpaces(rawcmd)
 		scmd := strings.Split(rawcmd, " ")
 
 		if len(scmd) >= 1 {

@@ -1,7 +1,7 @@
-package deploy
+package internal
 
 import (
-	"marauders-map-client-desktop/tools/ostools"
+	"marauders-map-client-desktop/tools"
 	"os"
 	"path"
 	"path/filepath"
@@ -59,7 +59,7 @@ func (w *Watchtower) setupBin() {
 	p := path.Join(w.GetWatchtowerPath(), w.GetBinaryName())
 
 	// Copy binary to HOME
-	ostools.CopyFile(w.GetBinaryPath(), p)
+	tools.CopyFile(w.GetBinaryPath(), p)
 }
 
 // Setup watchtower directory structure

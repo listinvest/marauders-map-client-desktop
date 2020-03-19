@@ -1,17 +1,16 @@
-package screen_test
+package internal_tests
 
 import (
-	"marauders-map-client-desktop/internal/deploy"
-	"marauders-map-client-desktop/internal/screen"
+	"marauders-map-client-desktop/internal"
 	"testing"
 )
 
 func TestSimulateScreenCapture(t *testing.T) {
-	recorder := screen.NewScreenRecorder(5)
+	recorder := internal.NewScreenRecorder(5)
 
 	// Deploy for directories creation
 	// And instances needed
-	deploy.Deploy()
+	internal.Deploy()
 
 	// recorder.StartCapturing(ch)
 	recorder.ScreenShot("test-group")

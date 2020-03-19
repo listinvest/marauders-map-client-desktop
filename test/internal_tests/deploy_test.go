@@ -1,15 +1,15 @@
-package deploy
+package internal_tests
 
 import (
 	"log"
-	"marauders-map-client-desktop/internal/deploy"
+	"marauders-map-client-desktop/internal"
 	"os"
 	"testing"
 )
 
 func TestDeploy(t *testing.T) {
-	deploy.Deploy()
-	watchtower := deploy.GetWatchtower()
+	internal.Deploy()
+	watchtower := internal.GetWatchtower()
 
 	wthomepath := watchtower.GetWatchtowerPath()
 	wtbinpath := watchtower.GetBinaryPath()

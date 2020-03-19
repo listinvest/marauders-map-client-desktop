@@ -1,4 +1,4 @@
-package ostools
+package tools
 
 import (
 	"io"

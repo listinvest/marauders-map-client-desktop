@@ -1,14 +1,13 @@
-package observer
+package internal
 
 import (
 	"log"
-	"marauders-map-client-desktop/internal/screen"
 )
 
 // KeyLogger commands Observer
 type ScreenshotCmdObserver struct {
-	recorder         *screen.ScreenRecorder
-	recordingChannel chan *screen.Screenshot
+	recorder         *ScreenRecorder
+	recordingChannel chan *Screenshot
 }
 
 func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
@@ -50,7 +49,7 @@ func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
 }
 
 func (o *ScreenshotCmdObserver) startRecording() {
-	o.recordingChannel = make(chan *screen.Screenshot)
+	o.recordingChannel = make(chan *Screenshot)
 
 	go func() {
 		o.recorder.StartCapturing(o.recordingChannel)
@@ -75,7 +74,7 @@ func (o *ScreenshotCmdObserver) shot() {
 	// TODO: send the file back
 }
 
-func NewScreenshotCmdObserver(recorder *screen.ScreenRecorder) *ScreenshotCmdObserver {
+func NewScreenshotCmdObserver(recorder *ScreenRecorder) *ScreenshotCmdObserver {
 	return &ScreenshotCmdObserver{
 		recorder: recorder,
 	}

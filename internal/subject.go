@@ -1,4 +1,4 @@
-package observer
+package internal
 
 // ===========================================
 // This is the subject where all

@@ -1,4 +1,4 @@
-package command
+package internal
 
 // ===========================================
 // Command Interface
@@ -6,4 +6,9 @@ package command
 // ===========================================
 type ResponseCommand interface {
 	execute()
+}
+
+type SendFileCommand struct {
+	AbsolutePath string
+	wsc          *WSClient
 }
