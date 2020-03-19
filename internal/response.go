@@ -9,8 +9,7 @@ import (
 )
 
 type SendFileCommand struct {
-	AbsolutePath string
-	wsc          *WSClient
+	wsc *WSClient
 }
 
 func (cmd *SendFileCommand) Send(filepath string) {

