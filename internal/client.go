@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"net/url"
 
@@ -101,7 +102,7 @@ func (wsc *WSClient) StartCommunications(subject *Subject) {
 	ch := make(chan string)
 
 	// TODO: goroutine here for reconnecting mechanism
-	wsc.Connect("ws", "localhost:8080", "/accesspoint")
+	wsc.Connect(wsc.wsscheme, fmt.Sprintf("%s:%s", wsc.wshost, wsc.wsport), wsc.wspath)
 
 	wsc.StartReadsMessages(ch)
 
