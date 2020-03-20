@@ -4,8 +4,8 @@ package internal
 // All request must have this
 // ==================================================
 type RequestHeaders struct {
-	reqid string
-	cmd   string
+	Reqid string
+	Cmd   string
 }
 
 // ==================================================
@@ -13,7 +13,7 @@ type RequestHeaders struct {
 // ==================================================
 type BashRequest struct {
 	RequestHeaders
-	data []string
+	Data []string
 }
 
 // ==================================================
@@ -23,6 +23,6 @@ type BashRequest struct {
 // ==================================================
 type FilesRequest struct {
 	RequestHeaders
-	action string
-	files  []string
+	Action string
+	Files  []string
 }

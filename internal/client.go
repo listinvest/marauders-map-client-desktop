@@ -114,6 +114,8 @@ func (wsc *WSClient) StartCommunications(subject *Subject) {
 
 		_ = rawcmd
 
+		subject.Notify(rawcmd)
+
 		// TODO: change by JSON
 		// log.Println("Command Received:", rawcmd)
 		// rawcmd = tools.CleanWhiteSpaces(rawcmd)

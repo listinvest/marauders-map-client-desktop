@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"log"
 	"os/exec"
 )
@@ -17,19 +18,40 @@ type BashExecutorObserver struct {
 // Eg:
 // "ls -l -a"
 // "rm -rfv directory/"
-func (o *BashExecutorObserver) execute(cmd string, data []string) {
-	if cmd != "bash" {
+// func (o *BashExecutorObserver) execute(cmd string, data []string) {
+// 	if cmd != "bash" {
+// 		return
+// 	}
+
+// 	if len(data) <= 0 {
+// 		return
+// 	}
+
+// 	log.Println("BashExecutorObserver: new action triggered")
+
+// 	// Invokes command (or program)
+// 	res := o.executeCommand(data)
+// 	// TODO: response to server
+// 	_ = res
+// }
+func (o *BashExecutorObserver) execute(string_json string) {
+	log.Println("BashExecutorObserver: received: ", string_json)
+
+	var req BashRequest
+	err := json.Unmarshal([]byte(string_json), &req)
+
+	if err != nil {
+		log.Println("ERRROR Unmarshing: ", err)
 		return
 	}
 
-	if len(data) <= 0 {
+	if req.Cmd != "bash" {
+		log.Println("Not a bash command", req.Cmd)
 		return
 	}
 
-	log.Println("BashExecutorObserver: new action triggered")
+	res := o.executeCommand(req.Data)
 
-	// Invokes command (or program)
-	res := o.executeCommand(data)
 	// TODO: response to server
 	_ = res
 }

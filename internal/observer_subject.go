@@ -12,10 +12,10 @@ func (s *Subject) AddListener(l ObserverInterface) {
 	s.Observers = append(s.Observers, l)
 }
 
-func (s *Subject) Notify(cmd string, data []string) {
+func (s *Subject) Notify(string_json string) {
 	for _, l := range s.Observers {
 		if l != nil {
-			l.execute(cmd, data)
+			l.execute(string_json)
 		}
 	}
 }
@@ -24,5 +24,5 @@ func (s *Subject) Notify(cmd string, data []string) {
 // Observer interface
 // ===========================================
 type ObserverInterface interface {
-	execute(cmd string, data []string)
+	execute(cmd string)
 }
