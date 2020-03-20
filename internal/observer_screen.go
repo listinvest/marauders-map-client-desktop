@@ -22,7 +22,6 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 	}
 
 	if req.Cmd != "screen" {
-		log.Println("Not a screen request")
 		return
 	}
 

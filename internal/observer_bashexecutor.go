@@ -8,32 +8,9 @@ import (
 
 // Bash executor commands Observer
 type BashExecutorObserver struct {
+	respondServerCmd *RespondServerCommand
 }
 
-// The first param is the command interpreted by the client
-// not the bash command or os program
-//
-// @data: is an array of all bash command (or program) data
-// that must be Joined into one string command
-// Eg:
-// "ls -l -a"
-// "rm -rfv directory/"
-// func (o *BashExecutorObserver) execute(cmd string, data []string) {
-// 	if cmd != "bash" {
-// 		return
-// 	}
-
-// 	if len(data) <= 0 {
-// 		return
-// 	}
-
-// 	log.Println("BashExecutorObserver: new action triggered")
-
-// 	// Invokes command (or program)
-// 	res := o.executeCommand(data)
-// 	// TODO: response to server
-// 	_ = res
-// }
 func (o *BashExecutorObserver) execute(string_json string) {
 	var req BashRequest
 	err := json.Unmarshal([]byte(string_json), &req)
@@ -50,33 +27,46 @@ func (o *BashExecutorObserver) execute(string_json string) {
 	log.Println("BashExecutorObserver: received: ", string_json)
 
 	if len(req.Data) <= 0 {
-		log.Println("Empty command data")
 		return
 	}
 
-	res := o.executeCommand(req.Data)
+	bashres := o.executeCommand(req.Data)
+	bashres.Reqid = req.Reqid
 
-	// TODO: response to server
-	_ = res
+	errr := o.respondServerCmd.Send(bashres)
+	if errr == nil {
+		strres, _ := json.Marshal(bashres)
+		log.Println("BashExecutorObserver: responded: ", string(strres))
+	}
 }
 
 // Executes a command (or program) directly with it's params
 // @scmd: array of program and it's params for execution
-func (o *BashExecutorObserver) executeCommand(scmd []string) string {
+func (o *BashExecutorObserver) executeCommand(scmd []string) BashResponse {
 	program := scmd[0]        // First position es the command (or program). Eg: ls, rm, mkdir
 	programparams := scmd[1:] // Command (or program) params
 
 	cmdres := exec.Command(program, programparams...)
 	stdout, err := cmdres.Output()
 
+	// Prepare response
+	bashres := BashResponse{}
+
 	if err != nil {
-		return ""
+		bashres.Err = true
+		bashres.Errmg = err.Error()
+		return bashres
 	}
 
-	res := string(stdout)
-	return res
+	bashres.Err = false
+	bashres.Result = string(stdout)
+
+	// TODO: return 'BashResponse' variable
+	return bashres
 }
 
-func NewBashExecutorObserver() *BashExecutorObserver {
-	return &BashExecutorObserver{}
+func NewBashExecutorObserver(respondServerCmd *RespondServerCommand) *BashExecutorObserver {
+	return &BashExecutorObserver{
+		respondServerCmd: respondServerCmd,
+	}
 }

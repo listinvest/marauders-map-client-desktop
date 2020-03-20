@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -48,6 +49,21 @@ func (cmd *SendFileCommand) Send(filepath string) {
 
 func NewSendFileCommand(wsc *WSClient) *SendFileCommand {
 	return &SendFileCommand{
+		wsc: wsc,
+	}
+}
+
+type RespondServerCommand struct {
+	wsc *WSClient
+}
+
+func (cmd *RespondServerCommand) Send(bashres BashResponse) error {
+	strbashres, _ := json.Marshal(bashres)
+	return cmd.wsc.SendMessage(string(strbashres))
+}
+
+func NewRespondServerCommand(wsc *WSClient) *RespondServerCommand {
+	return &RespondServerCommand{
 		wsc: wsc,
 	}
 }

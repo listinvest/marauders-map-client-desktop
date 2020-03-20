@@ -115,27 +115,6 @@ func (wsc *WSClient) StartCommunications(subject *Subject) {
 		_ = rawcmd
 
 		subject.Notify(rawcmd)
-
-		// TODO: change by JSON
-		// log.Println("Command Received:", rawcmd)
-		// rawcmd = tools.CleanWhiteSpaces(rawcmd)
-		// scmd := strings.Split(rawcmd, " ")
-
-		// if len(scmd) >= 1 {
-		// 	cmd := scmd[0]
-		// 	cdata := scmd[1:]
-
-		// 	subject.Notify(cmd, cdata)
-		// }
-
-		// TODO: delete this
-		// thanksmsg := fmt.Sprintf("Thank you! ...for your message: \"%s\"", data)
-		// err := SendMessage(thanksmsg)
-		// if err != nil {
-		// 	log.Printf("ERROR sending message: %s", data)
-		// 	log.Printf("ERROR reason: %s", err)
-		// }
-		// log.Printf("Message Sent: %s", thanksmsg)
 	}
 }
 

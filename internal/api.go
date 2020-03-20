@@ -1,7 +1,7 @@
 package internal
 
 // ==================================================
-// All request must have this
+// All requests must have this
 // ==================================================
 type RequestHeaders struct {
 	Reqid string
@@ -38,4 +38,23 @@ type ScreenRequest struct {
 	Action        string
 	Action_status string
 	Seconds       int
+}
+
+// ==========================================================================================
+
+// ==================================================
+// All responses must have this
+// ==================================================
+type ResponseHeaders struct {
+	Reqid string
+	Err   bool
+	Errmg string
+}
+
+// ==================================================
+// Response of shell command execution
+// ==================================================
+type BashResponse struct {
+	ResponseHeaders
+	Result string
 }
