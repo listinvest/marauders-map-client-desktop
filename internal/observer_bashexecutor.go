@@ -50,6 +50,11 @@ func (o *BashExecutorObserver) execute(string_json string) {
 		return
 	}
 
+	if len(req.Data) <= 0 {
+		log.Println("Empty command data")
+		return
+	}
+
 	res := o.executeCommand(req.Data)
 
 	// TODO: response to server
