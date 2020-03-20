@@ -3,13 +3,28 @@ A multiplatform WOCA backdoor written in Go
 
 Download here the [Spring Boot Server](https://github.com/apal7/marauders-map)
 
+## IMPORTANT
+Only for pentesting and personal use. I am not responsible for the use you may give(:
+
+### Definitions
+This payload offers you these operations:
+- Execute bash commands originated by the server
+- Download files from URLs by HTTP
+- Send files to server
+- Keylogger and Screen, recording
+
+This is a simple but very a effective payload. With the operations above you can execute RPC for downloading and executing programs like `Netcat` for reverse shell; compressing binaries like `tar`; `Nmap` for port scanning and recoignanse; `Ettercap` command line version for spoofing and HTTP content injection into the traffict; etc..
+Beside it comes with built in monitoring capabilities of keylogging and screen recording for a better performance
+
+**You can see API contract down below...**
+
 ### Windows
 For hidden shell window, build as follows:
 ```
 go build -ldflags -H=windowsgui main.go
 ```
 
-### API over Websocket connection
+### API contract over Websocket connection
 ```json
 // ========================================
 // BASH operations
