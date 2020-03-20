@@ -26,3 +26,16 @@ type FilesRequest struct {
 	Action string
 	Files  []string
 }
+
+// ==================================================
+// Request to
+// + start record screen
+// + stop record screen
+// + take screenshot
+// ==================================================
+type ScreenRequest struct {
+	RequestHeaders
+	Action        string
+	Action_status string
+	Seconds       int
+}

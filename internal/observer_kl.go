@@ -1,17 +1,10 @@
 package internal
 
-import "log"
-
 // KeyLogger commands Observer
 type KeyloggerCmdObserver struct {
 }
 
-func (o *KeyloggerCmdObserver) execute(cmd string, data []string) {
-	if cmd != "kl" {
-		return
-	}
-
-	log.Println("KeyloggerCmdObserver: new action triggered")
+func (o *KeyloggerCmdObserver) execute(string_json string) {
 }
 
 func NewKeyloggerCmdObserver() *KeyloggerCmdObserver {

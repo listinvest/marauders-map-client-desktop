@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"marauders-map-client-desktop/tools"
@@ -17,30 +18,33 @@ type FileCmdObserver struct {
 	watchtower  *Watchtower
 }
 
-func (o *FileCmdObserver) execute(cmd string, data []string) {
-	if cmd != "file" {
+func (o *FileCmdObserver) execute(string_json string) {
+	var req FilesRequest
+	err := json.Unmarshal([]byte(string_json), &req)
+
+	if err != nil {
+		log.Println("ERROR Unmarshing: ", err)
 		return
 	}
 
-	if len(data) <= 0 {
+	if req.Cmd != "file" {
 		return
 	}
 
-	action := data[0]
+	log.Println("FileCmdObserver: command received:", string_json)
 
-	switch action {
+	switch req.Action {
 	case "send":
-		files := data[1:]
+		files := req.Files
 		o.sendFiles(files)
 		break
 	case "download":
-		urls := data[1:]
+		urls := req.Files
 		for _, url := range urls {
 			o.downloadFile(url)
 		}
 		break
 	}
-
 }
 
 func (o *FileCmdObserver) sendFiles(files []string) {

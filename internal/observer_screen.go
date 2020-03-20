@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"log"
 )
 
@@ -11,34 +12,37 @@ type ScreenshotCmdObserver struct {
 	sendShotCmd      *SendFileCommand
 }
 
-func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
-	if cmd != "screen" {
+func (o *ScreenshotCmdObserver) execute(string_json string) {
+	var req ScreenRequest
+	err := json.Unmarshal([]byte(string_json), &req)
+
+	if err != nil {
+		log.Println("Not a screen parse request")
 		return
 	}
 
-	log.Println("ScreenshotCmdObserver: new action triggered")
-
-	// This commands needs data to operate
-	if len(data) <= 0 {
+	if req.Cmd != "screen" {
+		log.Println("Not a screen request")
 		return
 	}
 
-	action := data[0]
+	log.Println("ScreenshotCmdObserver: command received:", string_json)
 
-	switch action {
+	switch req.Action {
 	// Recording screen operations
 	case "record":
-		if len(data) <= 1 {
-			return
-		}
 
-		actioncmd := data[1]
-
-		switch actioncmd {
+		switch req.Action_status {
 		case "start":
+			seconds := req.Seconds
+
+			// TODO: implement recording by number of seconds requested
+			_ = seconds
+
 			// Starts recording in a folder
 			o.startRecording()
 			return
+
 		case "stop":
 			// Stops recording
 			o.stopRecording()
@@ -48,11 +52,10 @@ func (o *ScreenshotCmdObserver) execute(cmd string, data []string) {
 		break
 
 	// Take only one shot
-	case "shot":
+	case "screenshot":
 		o.shot()
 		break
 	}
-
 }
 
 func (o *ScreenshotCmdObserver) startRecording() {

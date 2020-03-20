@@ -35,8 +35,6 @@ type BashExecutorObserver struct {
 // 	_ = res
 // }
 func (o *BashExecutorObserver) execute(string_json string) {
-	log.Println("BashExecutorObserver: received: ", string_json)
-
 	var req BashRequest
 	err := json.Unmarshal([]byte(string_json), &req)
 
@@ -46,9 +44,10 @@ func (o *BashExecutorObserver) execute(string_json string) {
 	}
 
 	if req.Cmd != "bash" {
-		log.Println("Not a bash command", req.Cmd)
 		return
 	}
+
+	log.Println("BashExecutorObserver: received: ", string_json)
 
 	if len(req.Data) <= 0 {
 		log.Println("Empty command data")

