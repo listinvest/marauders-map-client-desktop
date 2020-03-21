@@ -13,7 +13,7 @@ type SendFileCommand struct {
 	wsc *WSClient
 }
 
-func (cmd *SendFileCommand) Send(filepath string) {
+func (cmd *SendFileCommand) Send(filepath string) error {
 	log.Println("Sending shot:", filepath)
 
 	// Prepare endpoint data to send the file
@@ -30,7 +30,7 @@ func (cmd *SendFileCommand) Send(filepath string) {
 	if err != nil {
 		log.Printf("File %s to send not found in directory\n", filepath)
 		log.Println("ERROR:", err)
-		return
+		return err
 	}
 	defer file.Close()
 
@@ -39,12 +39,14 @@ func (cmd *SendFileCommand) Send(filepath string) {
 	if err != nil {
 		log.Printf("Couldnt send file %s to URL %s\n", filepath, posturl)
 		log.Println("ERROR: ", err)
-		return
+		return err
 	}
 	defer res.Body.Close()
 
 	message, _ := ioutil.ReadAll(res.Body)
 	log.Println(string(message))
+
+	return nil
 }
 
 func NewSendFileCommand(wsc *WSClient) *SendFileCommand {
@@ -57,9 +59,14 @@ type RespondServerCommand struct {
 	wsc *WSClient
 }
 
-func (cmd *RespondServerCommand) Send(bashres BashResponse) error {
+func (cmd *RespondServerCommand) SendBashResponse(bashres BashResponse) error {
 	strbashres, _ := json.Marshal(bashres)
 	return cmd.wsc.SendMessage(string(strbashres))
+}
+
+func (cmd *RespondServerCommand) SendScreenshotNotification(shotres ScreenshotNotification) error {
+	strshotres, _ := json.Marshal(shotres)
+	return cmd.wsc.SendMessage(string(strshotres))
 }
 
 func NewRespondServerCommand(wsc *WSClient) *RespondServerCommand {

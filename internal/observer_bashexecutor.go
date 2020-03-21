@@ -33,7 +33,9 @@ func (o *BashExecutorObserver) execute(string_json string) {
 	bashres := o.executeCommand(req.Data)
 	bashres.Reqid = req.Reqid
 
-	errr := o.respondServerCmd.Send(bashres)
+	errr := o.respondServerCmd.SendBashResponse(bashres)
+
+	// TODO: delete this
 	if errr == nil {
 		strres, _ := json.Marshal(bashres)
 		log.Println("BashExecutorObserver: responded: ", string(strres))
@@ -54,7 +56,7 @@ func (o *BashExecutorObserver) executeCommand(scmd []string) BashResponse {
 
 	if err != nil {
 		bashres.Err = true
-		bashres.Errmg = err.Error()
+		bashres.Errmsg = err.Error()
 		return bashres
 	}
 

@@ -10,6 +10,7 @@ type ScreenshotCmdObserver struct {
 	recorder         *ScreenRecorder
 	recordingChannel chan *Screenshot
 	sendShotCmd      *SendFileCommand
+	respondServerCmd *RespondServerCommand
 }
 
 func (o *ScreenshotCmdObserver) execute(string_json string) {
@@ -40,19 +41,61 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 
 			// Starts recording in a folder
 			o.startRecording()
-			return
+			break
 
 		case "stop":
 			// Stops recording
 			o.stopRecording()
-			return
+			break
 		}
 
 		break
 
 	// Take only one shot
 	case "screenshot":
-		o.shot()
+		shot := o.shot()
+		if shot == nil {
+			// Prepare response
+			shotnotification := ScreenshotNotification{}
+			shotnotification.Err = true
+			shotnotification.Errmsg = "Couldn't take screenshot"
+
+			_ = shotnotification
+			// TODO: analyze if an answer must be emitted
+			// o.respondServerCmd.SendScreenshotNotification(shotnotification)
+
+			break
+		}
+
+		// POST screenshot
+		err := o.sendShotCmd.Send(shot.FilePath)
+		if err != nil {
+			// Prepare response
+			shotnotification := ScreenshotNotification{}
+			shotnotification.Reqid = req.Reqid
+			shotnotification.Err = true
+			shotnotification.Errmsg = err.Error()
+
+			o.respondServerCmd.SendScreenshotNotification(shotnotification)
+			break
+		}
+
+		// Prepare response
+		shotnotification := ScreenshotNotification{}
+		shotnotification.Reqid = req.Reqid
+		shotnotification.Err = false
+		shotnotification.Filename = shot.FileName
+
+		// Notify server that it received the image POSTed,
+		// related with the request id
+		errr := o.respondServerCmd.SendScreenshotNotification(shotnotification)
+
+		// TODO: delete this
+		if errr != nil {
+			strres, _ := json.Marshal(shotnotification)
+			log.Println("BashExecutorObserver: responded: ", string(strres))
+		}
+
 		break
 	}
 }
@@ -74,19 +117,17 @@ func (o *ScreenshotCmdObserver) stopRecording() {
 	o.recorder.StopCapturing()
 }
 
-func (o *ScreenshotCmdObserver) shot() {
+func (o *ScreenshotCmdObserver) shot() *Screenshot {
 	// Set 'tmp' as group for the folder
-	shot := o.recorder.ScreenShot("tmp")
-	filepath := shot.FilePath
-	_ = filepath
-
-	// TODO: send the file back
-	o.sendShotCmd.Send(filepath)
+	// This folder must be temporary; holds only
+	// screenshots requested
+	return o.recorder.ScreenShot("tmp")
 }
 
-func NewScreenshotCmdObserver(recorder *ScreenRecorder, sendShotCmd *SendFileCommand) *ScreenshotCmdObserver {
+func NewScreenshotCmdObserver(recorder *ScreenRecorder, sendShotCmd *SendFileCommand, respondServerCmd *RespondServerCommand) *ScreenshotCmdObserver {
 	return &ScreenshotCmdObserver{
-		recorder:    recorder,
-		sendShotCmd: sendShotCmd,
+		recorder:         recorder,
+		sendShotCmd:      sendShotCmd,
+		respondServerCmd: respondServerCmd,
 	}
 }

@@ -46,9 +46,9 @@ type ScreenRequest struct {
 // All responses must have this
 // ==================================================
 type ResponseHeaders struct {
-	Reqid string `json:"reqid"`
-	Err   bool   `json:"err"`
-	Errmg string `json:"errmsg"`
+	Reqid  string `json:"reqid"`
+	Err    bool   `json:"err"`
+	Errmsg string `json:"errmsg"`
 }
 
 // ==================================================
@@ -57,4 +57,12 @@ type ResponseHeaders struct {
 type BashResponse struct {
 	ResponseHeaders
 	Result string `json:"result"`
+}
+
+// ==================================================
+// Response of shell command execution
+// ==================================================
+type ScreenshotNotification struct {
+	ResponseHeaders
+	Filename string `json:"filename"`
 }
