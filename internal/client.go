@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -44,12 +45,14 @@ type HTTPConfiguration struct {
 func (wsc *WSClient) Connect(scheme string, host string, path string) {
 	u := url.URL{Scheme: scheme, Host: host, Path: path}
 
-	log.Printf("Connecting to '%s'", u.String())
-
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatal("Dial: ", err)
+		wsc.connected = false
+
+		return
 	}
+
+	log.Println("Connected to server")
 
 	wsc.conn = c
 	wsc.connected = true
@@ -84,10 +87,14 @@ func (wsc *WSClient) StartReadsMessages(ch chan string) {
 		defer close(ch)
 
 		for {
+			for !wsc.connected {
+				time.Sleep(1000)
+			}
+
 			_, message, err := wsc.conn.ReadMessage()
 			if err != nil {
-				log.Println("Read ERROR:", err)
-				break
+				wsc.connected = false
+				continue
 			}
 
 			ch <- string(message)
@@ -101,8 +108,16 @@ func (wsc *WSClient) StartReadsMessages(ch chan string) {
 func (wsc *WSClient) StartCommunications(subject *Subject) {
 	ch := make(chan string)
 
-	// TODO: goroutine here for reconnecting mechanism
-	wsc.Connect(wsc.wsscheme, fmt.Sprintf("%s:%s", wsc.wshost, wsc.wsport), wsc.wspath)
+	// Infinite loop for reconnecting mechanism
+	go func() {
+		for {
+			if wsc.connected {
+				continue
+			}
+
+			wsc.Connect(wsc.wsscheme, fmt.Sprintf("%s:%s", wsc.wshost, wsc.wsport), wsc.wspath)
+		}
+	}()
 
 	wsc.StartReadsMessages(ch)
 
