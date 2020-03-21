@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/url"
@@ -19,6 +21,8 @@ type WSClient struct {
 	// HTTP Address
 	// ====================
 	HTTPConfiguration
+
+	registered bool
 }
 
 type WSConfiguration struct {
@@ -52,10 +56,34 @@ func (wsc *WSClient) Connect(scheme string, host string, path string) {
 		return
 	}
 
+	// Register client to the server
+	wsc.Register()
+
 	log.Println("Connected to server")
 
 	wsc.conn = c
 	wsc.connected = true
+}
+
+// Register client to the server
+func (wsc *WSClient) Register() bool {
+
+	// TODO: add all the possible data
+	regreq := MarauderRegistrationRequest{
+		Action: "marauder-registration",
+	}
+
+	// Send client registration to the server with
+	// all the device information
+	strregreq, _ := json.Marshal(regreq)
+	err := wsc.SendMessage(string(strregreq))
+	if err != nil {
+		wsc.registered = false
+	} else {
+		wsc.registered = true
+	}
+
+	return wsc.registered
 }
 
 /*
@@ -71,7 +99,7 @@ func (wsc *WSClient) Disconnect() {
  */
 func (wsc *WSClient) SendMessage(msg string) error {
 	if wsc.conn == nil || !wsc.connected {
-		panic("WebSocket Connection needed!")
+		return errors.New("Can't send message. A connection is needed")
 	}
 
 	return wsc.conn.WriteMessage(websocket.TextMessage, []byte(msg))

