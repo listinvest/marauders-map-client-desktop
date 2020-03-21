@@ -15,6 +15,10 @@ func (s *Subject) AddListener(l ObserverInterface) {
 func (s *Subject) Notify(string_json string) {
 	for _, l := range s.Observers {
 		if l != nil {
+			// TODO: Goroutine with Mutex here!
+			// With a Goroutine here the client could process
+			// many request at same time
+			// Eg: send keystrokes, while it's recording screen
 			l.execute(string_json)
 		}
 	}
