@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 )
 
@@ -68,9 +69,10 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 		}
 
 		// POST screenshot
-		err := o.sendShotCmd.Send(shot.FilePath)
+		res, err := o.sendShotCmd.Send(shot.FilePath)
+		defer res.Body.Close()
 		if err != nil {
-			// Prepare response
+			// Prepare ERROR response
 			shotnotification := ScreenshotNotification{}
 			shotnotification.Reqid = req.Reqid
 			shotnotification.Err = true
@@ -80,10 +82,14 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 			break
 		}
 
-		// Prepare response
+		// Prepare OK response
+		data, _ := ioutil.ReadAll(res.Body)
+		shotId := string(data)
+
 		shotnotification := ScreenshotNotification{}
 		shotnotification.Reqid = req.Reqid
 		shotnotification.Err = false
+		shotnotification.Id = shotId
 		shotnotification.Filename = shot.FileName
 
 		// Notify server that it received the image POSTed,
@@ -93,7 +99,7 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 		// TODO: delete this
 		if errr != nil {
 			strres, _ := json.Marshal(shotnotification)
-			log.Println("BashExecutorObserver: responded: ", string(strres))
+			log.Println("ScreenshotCmdObserver: responded: ", string(strres))
 		}
 
 		break

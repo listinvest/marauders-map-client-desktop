@@ -70,6 +70,7 @@ type BashResponse struct {
 // ==================================================
 type ScreenshotNotification struct {
 	ResponseHeaders
+	Id       string `json:"id"`
 	Filename string `json:"filename"`
 }
 

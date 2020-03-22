@@ -15,7 +15,7 @@ type SendFileCommand struct {
 	wsc *WSClient
 }
 
-func (cmd *SendFileCommand) Send(filepath string) error {
+func (cmd *SendFileCommand) Send(filepath string) (*http.Response, error) {
 	log.Println("Sending shot:", filepath)
 
 	// Prepare endpoint data to send the file
@@ -32,7 +32,7 @@ func (cmd *SendFileCommand) Send(filepath string) error {
 	if err != nil {
 		log.Printf("File %s to send not found in directory\n", filepath)
 		log.Println("ERROR:", err)
-		return err
+		return nil, err
 	}
 	defer file.Close()
 
@@ -45,9 +45,9 @@ func (cmd *SendFileCommand) Send(filepath string) error {
 	r, _ := http.NewRequest("POST", posturl, body)
 	r.Header.Add("Content-Type", writer.FormDataContentType())
 	client := &http.Client{}
-	_, ee := client.Do(r)
+	res, ee := client.Do(r)
 
-	return ee
+	return res, ee
 }
 
 func NewSendFileCommand(wsc *WSClient) *SendFileCommand {
