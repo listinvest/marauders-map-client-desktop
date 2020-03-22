@@ -1,10 +1,12 @@
 package internal
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 )
@@ -34,17 +36,21 @@ func (cmd *SendFileCommand) Send(filepath string) error {
 	}
 	defer file.Close()
 
-	// POST it
-	res, err := http.Post(posturl, "binary/octet-stream", file)
-	if err != nil {
-		log.Printf("Couldnt send file %s to URL %s\n", filepath, posturl)
-		log.Println("ERROR: ", err)
-		return err
-	}
-	defer res.Body.Close()
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, _ := writer.CreateFormFile("file", filepath)
+	io.Copy(part, file)
+	writer.Close()
 
-	message, _ := ioutil.ReadAll(res.Body)
-	log.Println(string(message))
+	r, _ := http.NewRequest("POST", posturl, body)
+	r.Header.Add("Content-Type", writer.FormDataContentType())
+	client := &http.Client{}
+	_, ee := client.Do(r)
+	if ee != nil {
+		log.Println("ERROR: ", ee)
+	} else {
+		log.Println("Sent!")
+	}
 
 	return nil
 }

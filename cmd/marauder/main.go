@@ -18,7 +18,7 @@ func main() {
 	// ===========================================================================
 	// Creates WSClient configurations
 	wscconf := internal.NewWSConfiguration("ws", "localhost", "8080", "/accesspoint")
-	httpconf := internal.NewHTTPConfiguration("http", "localhost", "80", "/upload")
+	httpconf := internal.NewHTTPConfiguration("http", "localhost", "8080", "/file/upload")
 
 	// Creates WSClient
 	wsc := internal.NewWSClient(wscconf, httpconf)
