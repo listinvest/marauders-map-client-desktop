@@ -46,13 +46,8 @@ func (cmd *SendFileCommand) Send(filepath string) error {
 	r.Header.Add("Content-Type", writer.FormDataContentType())
 	client := &http.Client{}
 	_, ee := client.Do(r)
-	if ee != nil {
-		log.Println("ERROR: ", ee)
-	} else {
-		log.Println("Sent!")
-	}
 
-	return nil
+	return ee
 }
 
 func NewSendFileCommand(wsc *WSClient) *SendFileCommand {
