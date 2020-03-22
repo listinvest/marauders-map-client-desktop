@@ -36,12 +36,16 @@ func (cmd *SendFileCommand) Send(filepath string) (*http.Response, error) {
 	}
 	defer file.Close()
 
+	// This is the body of the multipart request
 	body := &bytes.Buffer{}
+
+	//Writter for of the Body request
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", filepath)
 	io.Copy(part, file)
 	writer.Close()
 
+	// Dispatch request
 	r, _ := http.NewRequest("POST", posturl, body)
 	r.Header.Add("Content-Type", writer.FormDataContentType())
 	client := &http.Client{}

@@ -100,7 +100,10 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 		if errr != nil {
 			strres, _ := json.Marshal(shotnotification)
 			log.Println("ScreenshotCmdObserver: responded: ", string(strres))
+			break
 		}
+
+		log.Println("Service notified about screenshot")
 
 		break
 	}
