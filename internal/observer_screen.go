@@ -62,9 +62,7 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 			shotnotification.Errmsg = "Couldn't take screenshot"
 
 			_ = shotnotification
-			// TODO: analyze if an answer must be emitted
-			// o.respondServerCmd.SendScreenshotNotification(shotnotification)
-
+			o.respondServerCmd.SendScreenshotNotification(shotnotification)
 			break
 		}
 
