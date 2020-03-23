@@ -66,10 +66,11 @@ type BashResponse struct {
 }
 
 // ==================================================
-// Response of screenshot command execution
+// Response of file command execution
 // ==================================================
-type ScreenshotNotification struct {
+type FileNotification struct {
 	ResponseHeaders
+	Typ      string `json:"type"`
 	Id       string `json:"id"`
 	Filename string `json:"filename"`
 }

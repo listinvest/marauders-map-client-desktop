@@ -3,6 +3,7 @@ package internal
 import (
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"log"
 	"marauders-map-client-desktop/tools"
 	"net/http"
@@ -14,8 +15,9 @@ import (
 // Observer for sending to server files
 // ==========================================================
 type FileCmdObserver struct {
-	sendFileCmd *SendFileCommand
-	watchtower  *Watchtower
+	sendFileCmd      *SendFileCommand
+	watchtower       *Watchtower
+	respondServerCmd *RespondServerCommand
 }
 
 func (o *FileCmdObserver) execute(string_json string) {
@@ -36,7 +38,7 @@ func (o *FileCmdObserver) execute(string_json string) {
 	switch req.Action {
 	case "send":
 		files := req.Files
-		o.sendFiles(files)
+		o.sendFiles(req, files)
 		break
 	case "download":
 		urls := req.Files
@@ -47,14 +49,51 @@ func (o *FileCmdObserver) execute(string_json string) {
 	}
 }
 
-func (o *FileCmdObserver) sendFiles(files []string) {
+func (o *FileCmdObserver) sendFiles(req FilesRequest, files []string) {
+	log.Printf("Sending %d files", len(files))
+
 	for _, f := range files {
 		if !tools.FileExists(f) {
 			log.Printf("File requested '%s' doesn't exist\n", f)
 			continue
 		}
 
-		o.sendFileCmd.Send(f)
+		// POST file
+		res, err := o.sendFileCmd.Send(f)
+		defer res.Body.Close()
+		if err != nil {
+			// Prepare ERROR response
+			filenotification := FileNotification{}
+			filenotification.Reqid = req.Reqid
+			filenotification.Err = true
+			filenotification.Errmsg = err.Error()
+			filenotification.Typ = "file"
+
+			o.respondServerCmd.SendFileNotification(filenotification)
+			break
+		}
+
+		// Prepare OK response
+		data, _ := ioutil.ReadAll(res.Body)
+		shotId := string(data)
+
+		filenotification := FileNotification{}
+		filenotification.Reqid = req.Reqid
+		filenotification.Err = false
+		filenotification.Id = shotId
+		filenotification.Typ = "file"
+		filenotification.Filename = f
+
+		errr := o.respondServerCmd.SendFileNotification(filenotification)
+		// TODO: delete this
+		if errr != nil {
+			strres, _ := json.Marshal(filenotification)
+			log.Println("ScreenshotCmdObserver: responded: ", string(strres))
+			break
+		}
+
+		log.Println("Service notified about file")
+
 	}
 }
 
@@ -90,9 +129,10 @@ func (o *FileCmdObserver) downloadFile(url string) error {
 	return err
 }
 
-func NewFileCmdObserver(sendFileCmd *SendFileCommand, watchtower *Watchtower) *FileCmdObserver {
+func NewFileCmdObserver(sendFileCmd *SendFileCommand, watchtower *Watchtower, respondServerCmd *RespondServerCommand) *FileCmdObserver {
 	return &FileCmdObserver{
-		sendFileCmd: sendFileCmd,
-		watchtower:  watchtower,
+		sendFileCmd:      sendFileCmd,
+		watchtower:       watchtower,
+		respondServerCmd: respondServerCmd,
 	}
 }

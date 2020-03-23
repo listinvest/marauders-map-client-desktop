@@ -57,12 +57,13 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 		shot := o.shot()
 		if shot == nil {
 			// Prepare response
-			shotnotification := ScreenshotNotification{}
+			shotnotification := FileNotification{}
 			shotnotification.Err = true
 			shotnotification.Errmsg = "Couldn't take screenshot"
+			shotnotification.Typ = "screenshot"
 
 			_ = shotnotification
-			o.respondServerCmd.SendScreenshotNotification(shotnotification)
+			o.respondServerCmd.SendFileNotification(shotnotification)
 			break
 		}
 
@@ -71,12 +72,13 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 		defer res.Body.Close()
 		if err != nil {
 			// Prepare ERROR response
-			shotnotification := ScreenshotNotification{}
+			shotnotification := FileNotification{}
 			shotnotification.Reqid = req.Reqid
 			shotnotification.Err = true
 			shotnotification.Errmsg = err.Error()
+			shotnotification.Typ = "screenshot"
 
-			o.respondServerCmd.SendScreenshotNotification(shotnotification)
+			o.respondServerCmd.SendFileNotification(shotnotification)
 			break
 		}
 
@@ -84,15 +86,16 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 		data, _ := ioutil.ReadAll(res.Body)
 		shotId := string(data)
 
-		shotnotification := ScreenshotNotification{}
+		shotnotification := FileNotification{}
 		shotnotification.Reqid = req.Reqid
+		shotnotification.Typ = "screenshot"
 		shotnotification.Err = false
 		shotnotification.Id = shotId
 		shotnotification.Filename = shot.FileName
 
 		// Notify server that it received the image POSTed,
 		// related with the request id
-		errr := o.respondServerCmd.SendScreenshotNotification(shotnotification)
+		errr := o.respondServerCmd.SendFileNotification(shotnotification)
 
 		// TODO: delete this
 		if errr != nil {
