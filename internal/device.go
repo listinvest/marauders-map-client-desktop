@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"net"
 	"os/user"
 	"runtime"
@@ -87,6 +88,30 @@ func (dev *Device) DiscoverMachineUsers() ([]string, error) {
 func (dev *Device) DiscoverOSInstallationDate() (string, error) {
 	// TODO: find a multiplatform ay to discover the installation date of the OS
 	return "", nil
+}
+
+// Load all information of the device
+func (dev *Device) ToMap() map[string]string {
+	devmap := make(map[string]string)
+	devmap["dev_devicetype"] = "desktop"
+	devmap["dev_devicename"] = dev.Devicename
+	devmap["dev_username"] = dev.Username
+	devmap["dev_userhomedir"] = dev.Userhomedir
+	devmap["dev_os"] = dev.Os
+	devmap["dev_arch"] = dev.Arch
+	devmap["dev_osinstallationdate"] = dev.OsInstallationdate
+
+	for i, u := range dev.Machineusers {
+		index := fmt.Sprintf("dev_machineusers_%d", i)
+		devmap[index] = u
+	}
+
+	for i, mac := range dev.Macaddresses {
+		index := fmt.Sprintf("dev_macaddresses_%d", i)
+		devmap[index] = mac
+	}
+
+	return devmap
 }
 
 func NewDevice() Device {

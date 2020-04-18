@@ -1,45 +1,18 @@
 package internal
 
 import (
-	"encoding/json"
-	"log"
 	"os/exec"
 )
 
 // Bash executor commands Observer
 type BashExecutorObserver struct {
-	respondServerCmd *RespondServerCommand
 }
 
 func (o *BashExecutorObserver) execute(string_json string) {
-	var req BashRequest
-	err := json.Unmarshal([]byte(string_json), &req)
 
-	if err != nil {
-		log.Println("ERRROR Unmarshing: ", err)
-		return
-	}
+	// bashres := o.executeCommand(req.Data)
+	// bashres.Reqid = req.Reqid
 
-	if req.Cmd != "bash" {
-		return
-	}
-
-	log.Println("BashExecutorObserver: received: ", string_json)
-
-	if len(req.Data) <= 0 {
-		return
-	}
-
-	bashres := o.executeCommand(req.Data)
-	bashres.Reqid = req.Reqid
-
-	errr := o.respondServerCmd.SendBashResponse(bashres)
-
-	// TODO: delete this
-	if errr == nil {
-		strres, _ := json.Marshal(bashres)
-		log.Println("BashExecutorObserver: responded: ", string(strres))
-	}
 }
 
 // Executes a command (or program) directly with it's params
@@ -67,8 +40,6 @@ func (o *BashExecutorObserver) executeCommand(scmd []string) BashResponse {
 	return bashres
 }
 
-func NewBashExecutorObserver(respondServerCmd *RespondServerCommand) *BashExecutorObserver {
-	return &BashExecutorObserver{
-		respondServerCmd: respondServerCmd,
-	}
+func NewBashExecutorObserver() *BashExecutorObserver {
+	return &BashExecutorObserver{}
 }

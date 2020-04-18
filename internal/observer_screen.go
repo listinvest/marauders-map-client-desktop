@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 )
 
@@ -10,8 +9,6 @@ import (
 type ScreenshotCmdObserver struct {
 	recorder         *ScreenRecorder
 	recordingChannel chan *Screenshot
-	sendShotCmd      *SendFileCommand
-	respondServerCmd *RespondServerCommand
 }
 
 func (o *ScreenshotCmdObserver) execute(string_json string) {
@@ -57,54 +54,11 @@ func (o *ScreenshotCmdObserver) execute(string_json string) {
 		shot := o.shot()
 		if shot == nil {
 			// Prepare response
-			shotnotification := FileNotification{}
-			shotnotification.Err = true
-			shotnotification.Errmsg = "Couldn't take screenshot"
-			shotnotification.Typ = "screenshot"
-
-			_ = shotnotification
-			o.respondServerCmd.SendFileNotification(shotnotification)
 			break
 		}
 
-		// POST screenshot
-		res, err := o.sendShotCmd.Send(shot.FilePath)
-		defer res.Body.Close()
-		if err != nil {
-			// Prepare ERROR response
-			shotnotification := FileNotification{}
-			shotnotification.Reqid = req.Reqid
-			shotnotification.Err = true
-			shotnotification.Errmsg = err.Error()
-			shotnotification.Typ = "screenshot"
-
-			o.respondServerCmd.SendFileNotification(shotnotification)
-			break
-		}
-
-		// Prepare OK response
-		data, _ := ioutil.ReadAll(res.Body)
-		shotId := string(data)
-
-		shotnotification := FileNotification{}
-		shotnotification.Reqid = req.Reqid
-		shotnotification.Typ = "screenshot"
-		shotnotification.Err = false
-		shotnotification.Id = shotId
-		shotnotification.Filename = shot.FileName
-
-		// Notify server that it received the image POSTed,
-		// related with the request id
-		errr := o.respondServerCmd.SendFileNotification(shotnotification)
-
-		// TODO: delete this
-		if errr != nil {
-			strres, _ := json.Marshal(shotnotification)
-			log.Println("ScreenshotCmdObserver: responded: ", string(strres))
-			break
-		}
-
-		log.Println("Service notified about screenshot")
+		// TODO: send screenshot
+		// ..
 
 		break
 	}
@@ -134,10 +88,8 @@ func (o *ScreenshotCmdObserver) shot() *Screenshot {
 	return o.recorder.ScreenShot("tmp")
 }
 
-func NewScreenshotCmdObserver(recorder *ScreenRecorder, sendShotCmd *SendFileCommand, respondServerCmd *RespondServerCommand) *ScreenshotCmdObserver {
+func NewScreenshotCmdObserver(recorder *ScreenRecorder) *ScreenshotCmdObserver {
 	return &ScreenshotCmdObserver{
-		recorder:         recorder,
-		sendShotCmd:      sendShotCmd,
-		respondServerCmd: respondServerCmd,
+		recorder: recorder,
 	}
 }

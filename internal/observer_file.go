@@ -3,7 +3,6 @@ package internal
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"log"
 	"marauders-map-client-desktop/tools"
 	"net/http"
@@ -15,9 +14,7 @@ import (
 // Observer for sending to server files
 // ==========================================================
 type FileCmdObserver struct {
-	sendFileCmd      *SendFileCommand
-	watchtower       *Watchtower
-	respondServerCmd *RespondServerCommand
+	watchtower *Watchtower
 }
 
 func (o *FileCmdObserver) execute(string_json string) {
@@ -58,42 +55,8 @@ func (o *FileCmdObserver) sendFiles(req FilesRequest, files []string) {
 			continue
 		}
 
-		// POST file
-		res, err := o.sendFileCmd.Send(f)
-		defer res.Body.Close()
-		if err != nil {
-			// Prepare ERROR response
-			filenotification := FileNotification{}
-			filenotification.Reqid = req.Reqid
-			filenotification.Err = true
-			filenotification.Errmsg = err.Error()
-			filenotification.Typ = "file"
-
-			o.respondServerCmd.SendFileNotification(filenotification)
-			break
-		}
-
-		// Prepare OK response
-		data, _ := ioutil.ReadAll(res.Body)
-		shotId := string(data)
-
-		filenotification := FileNotification{}
-		filenotification.Reqid = req.Reqid
-		filenotification.Err = false
-		filenotification.Id = shotId
-		filenotification.Typ = "file"
-		filenotification.Filename = f
-
-		errr := o.respondServerCmd.SendFileNotification(filenotification)
-		// TODO: delete this
-		if errr != nil {
-			strres, _ := json.Marshal(filenotification)
-			log.Println("ScreenshotCmdObserver: responded: ", string(strres))
-			break
-		}
-
-		log.Println("Service notified about file")
-
+		// TODO: send file
+		//..
 	}
 }
 
@@ -129,10 +92,8 @@ func (o *FileCmdObserver) downloadFile(url string) error {
 	return err
 }
 
-func NewFileCmdObserver(sendFileCmd *SendFileCommand, watchtower *Watchtower, respondServerCmd *RespondServerCommand) *FileCmdObserver {
+func NewFileCmdObserver(watchtower *Watchtower) *FileCmdObserver {
 	return &FileCmdObserver{
-		sendFileCmd:      sendFileCmd,
-		watchtower:       watchtower,
-		respondServerCmd: respondServerCmd,
+		watchtower: watchtower,
 	}
 }
