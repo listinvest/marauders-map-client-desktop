@@ -9,9 +9,7 @@ import (
 )
 
 type WSClient struct {
-	// ====================
 	// Websocket URL
-	// ====================
 	WSConfiguration
 
 	connected bool
@@ -20,18 +18,21 @@ type WSClient struct {
 	stompclient      *gostompclient.Client
 }
 
-type StompCredentials struct {
-	username string
-	password string
-}
-
 type WSConfiguration struct {
 	wsscheme string
 	wshost   string
 	wsport   string
 	wspath   string
+}
 
-	stompclient *gostompclient.Client
+type StompCredentials struct {
+	username string
+	password string
+}
+
+type Subscription struct {
+	Queue  string
+	Worker Worker
 }
 
 /**
@@ -58,6 +59,17 @@ func (wsc *WSClient) Connect() {
 	wsc.connected = wsc.stompclient.IsSTOMPConnected()
 }
 
+/*
+ * Disconnects from WebSocket server
+ */
+func (wsc *WSClient) Disconnect() {
+	log.Println("Closing websocket connection")
+	wsc.stompclient.Disconnect()
+}
+
+/*
+ * Add device information to a specific header
+ */
 func (wsc *WSClient) AddDeviceToHeaders(device Device, headers *gostompclient.Header) *gostompclient.Header {
 	if headers == nil {
 		headers = gostompclient.NewHeader()
@@ -86,14 +98,6 @@ func (wsc *WSClient) SetCredentials(username string, password string) {
 }
 
 /*
- * Disconnects from WebSocket server
- */
-func (wsc *WSClient) Disconnect() {
-	log.Println("Closing websocket connection")
-	wsc.stompclient.Disconnect()
-}
-
-/*
  * Send a Message to a queue
  */
 func (wsc *WSClient) Send(queue string, message []byte) {
@@ -103,8 +107,29 @@ func (wsc *WSClient) Send(queue string, message []byte) {
 /*
  * Subscribe for a message
  */
-func (wsc *WSClient) Subscribe(queue string, ch chan *gostompclient.Frame) {
-	wsc.stompclient.Subscribe(queue, nil, ch)
+//  func (wsc *WSClient) Subscribe(queue string, ch chan *gostompclient.Frame) {
+func (wsc *WSClient) Subscribe(sub *Subscription) {
+	wsc.stompclient.Subscribe(sub.Queue, nil, sub.Worker.GetChannel())
+}
+
+/*
+ * Configure queue subscriptions
+ */
+func (wsc *WSClient) ConfigureSubscriptions(subs []*Subscription) {
+	for _, sub := range subs {
+		wsc.Subscribe(sub)
+	}
+}
+
+// ==================================================
+// Constructors
+// ==================================================
+
+func NewSubscription(queue string, worker Worker) *Subscription {
+	return &Subscription{
+		Queue:  queue,
+		Worker: worker,
+	}
 }
 
 func NewWSClient(wsconf WSConfiguration) *WSClient {
