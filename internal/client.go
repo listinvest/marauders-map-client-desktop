@@ -6,8 +6,6 @@ import (
 	"net/url"
 
 	gostompclient "github.com/apal7/go-stomp-client"
-
-	"github.com/gorilla/websocket"
 )
 
 type WSClient struct {
@@ -16,7 +14,7 @@ type WSClient struct {
 	// ====================
 	WSConfiguration
 
-	registered bool
+	connected bool
 
 	stompcredentials StompCredentials
 	stompclient      *gostompclient.Client
@@ -32,9 +30,6 @@ type WSConfiguration struct {
 	wshost   string
 	wsport   string
 	wspath   string
-
-	conn      *websocket.Conn
-	connected bool
 
 	stompclient *gostompclient.Client
 }
@@ -55,8 +50,12 @@ func (wsc *WSClient) Connect() {
 	clientheaders.AddHeader("username", wsc.stompcredentials.username)
 	clientheaders.AddHeader("password", wsc.stompcredentials.password)
 
-	stompclient := gostompclient.NewClient(wsurl.String(), nil)
-	stompclient.Connect(clientheaders)
+	wsc.stompclient = gostompclient.NewClient(wsurl.String(), nil)
+	wsc.stompclient.Connect(clientheaders)
+
+	wsc.stompclient.InitInboundChannel()
+
+	wsc.connected = wsc.stompclient.IsSTOMPConnected()
 }
 
 func (wsc *WSClient) AddDeviceToHeaders(device Device, headers *gostompclient.Header) *gostompclient.Header {
@@ -91,8 +90,21 @@ func (wsc *WSClient) SetCredentials(username string, password string) {
  */
 func (wsc *WSClient) Disconnect() {
 	log.Println("Closing websocket connection")
-	wsc.conn.Close()
 	wsc.stompclient.Disconnect()
+}
+
+/*
+ * Send a Message to a queue
+ */
+func (wsc *WSClient) Send(queue string, message []byte) {
+	wsc.stompclient.Send(queue, message)
+}
+
+/*
+ * Subscribe for a message
+ */
+func (wsc *WSClient) Subscribe(queue string, ch chan *gostompclient.Frame) {
+	wsc.stompclient.Subscribe(queue, nil, ch)
 }
 
 func NewWSClient(wsconf WSConfiguration) *WSClient {

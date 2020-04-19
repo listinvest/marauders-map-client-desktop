@@ -24,6 +24,7 @@ func main() {
 	wsc := internal.NewWSClient(wscconf)
 	wsc.SetCredentials("apal7", "pass")
 	wsc.Connect()
+	defer wsc.Disconnect()
 
 	// // Initialize Observer for processing incoming
 	// // commands from server
