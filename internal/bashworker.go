@@ -7,8 +7,9 @@ import (
 )
 
 type BashWorker struct {
-	ch      chan *gostompclient.Frame
-	running bool
+	ch          chan *gostompclient.Frame
+	running     bool
+	channelOpen bool
 }
 
 func (w *BashWorker) GetChannel() chan *gostompclient.Frame {
@@ -24,7 +25,7 @@ func (w *BashWorker) Start() {
 		return
 	}
 
-	if w.ch == nil {
+	if w.ch == nil || !w.channelOpen {
 		w.SetupChannel()
 	}
 
@@ -40,12 +41,12 @@ func (w *BashWorker) Start() {
 
 func (w *BashWorker) Stop() {
 	w.running = false
-	close(w.ch)
-	log.Println("BashWorker - channel closed")
+	log.Println("BashWorker - stopped")
 }
 
 func (w *BashWorker) SetupChannel() {
 	w.ch = make(chan *gostompclient.Frame)
+	w.channelOpen = true
 }
 
 func NewBashWorker() *BashWorker {

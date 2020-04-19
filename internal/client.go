@@ -113,6 +113,13 @@ func (wsc *WSClient) Subscribe(sub *Subscription) {
 }
 
 /*
+ * Subscribe for a message
+ */
+func (wsc *WSClient) SubscribeWithChan(queue string, ch chan *gostompclient.Frame) {
+	wsc.stompclient.Subscribe(queue, nil, ch)
+}
+
+/*
  * Configure queue subscriptions
  */
 func (wsc *WSClient) ConfigureSubscriptions(subs []*Subscription) {

@@ -31,25 +31,19 @@ func main() {
 	bashWorker.Start()
 
 	var subs []*internal.Subscription
-	subs = append(subs, internal.NewSubscription("/temp/queue/queue/greetings", bashWorker))
+	subs = append(subs, internal.NewSubscription("/temp-queue/queue/greetings", bashWorker))
 
 	wsc.ConfigureSubscriptions(subs)
 
+	go func() {
+		for {
+			time.Sleep(3 * time.Second)
+			wsc.Send("/app/marauder/bash/req", []byte("{\"marauder_id\":\"123\", \"command\":\"ls\"}"))
+		}
+	}()
+
 	for {
-		time.Sleep(3 * time.Second)
-		wsc.Send("/app/marauder/bash/req", []byte("{\"marauder_id\":\"123\", \"command\":\"ls\"}"))
 	}
-
-	// bashCh := make(chan *gostompclient.Frame)
-	// wsc.Subscribe("/temp-queue/queue/greetings", bashCh)
-
-	// bashWorker := internal.NewBashWorker()
-	// bashWorker.Start(bashCh)
-
-	// wsc.Send("/app/marauder/bash/req", []byte("{\"marauder_id\":\"123\", \"command\":\"ls\"}"))
-
-	// for {
-	// }
 
 	// // Initialize Observer for processing incoming
 	// // commands from server
