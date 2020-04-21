@@ -122,7 +122,7 @@ func (wsc *WSClient) SubscribeWithChan(queue string, ch chan *gostompclient.Fram
 /*
  * Configure queue subscriptions
  */
-func (wsc *WSClient) ConfigureSubscriptions(subs []*Subscription) {
+func (wsc *WSClient) SetupSubscriptions(subs []*Subscription) {
 	for _, sub := range subs {
 		wsc.Subscribe(sub)
 	}

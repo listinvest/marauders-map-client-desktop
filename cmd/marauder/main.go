@@ -33,7 +33,7 @@ func main() {
 	var subs []*internal.Subscription
 	subs = append(subs, internal.NewSubscription("/temp-queue/queue/greetings", bashWorker))
 
-	wsc.ConfigureSubscriptions(subs)
+	wsc.SetupSubscriptions(subs)
 
 	go func() {
 		for {
