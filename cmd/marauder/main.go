@@ -13,11 +13,6 @@ func main() {
 	watchtower := internal.Deploy()
 	_ = watchtower
 
-	// ===========================================================================
-	// Start connection and communication with server
-	// Subject with Observers is passed as parameter
-	// for processing commands
-	// ===========================================================================
 	// Creates WSClient configurations
 	wscconf := internal.NewWSConfiguration("ws", "localhost", "8080", "/accesspoint")
 
@@ -27,11 +22,13 @@ func main() {
 	wsc.Connect()
 	defer wsc.Disconnect()
 
-	bashWorker := internal.NewBashWorker()
+	// Workers services
+	bashWorker := internal.NewBashWorker(wsc)
 	bashWorker.Start()
 
+	// Creates subcriptions
 	var subs []*internal.Subscription
-	subs = append(subs, internal.NewSubscription("/temp-queue/queue/greetings", bashWorker))
+	subs = append(subs, internal.NewSubscription("/temp-queue/queue/marauder/bash/req", bashWorker))
 
 	wsc.SetupSubscriptions(subs)
 

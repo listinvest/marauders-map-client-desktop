@@ -16,8 +16,13 @@ type RequestHeaders struct {
 // Request to execute a bash shell command
 // ==================================================
 type BashRequest struct {
-	RequestHeaders
-	Data []string
+	Reqid       string `json:"reqid"`
+	BashCommand string `json:"command"`
+}
+
+type BashResponse struct {
+	Reqid       string `json:"reqid"`
+	BashResults string `json:"bashresults"`
 }
 
 // ==================================================
@@ -55,14 +60,6 @@ type ResponseHeaders struct {
 	Reqid  string `json:"reqid"`
 	Err    bool   `json:"err"`
 	Errmsg string `json:"errmsg"`
-}
-
-// ==================================================
-// Response of shell command execution
-// ==================================================
-type BashResponse struct {
-	ResponseHeaders
-	Result string `json:"result"`
 }
 
 // ==================================================
