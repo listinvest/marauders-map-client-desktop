@@ -81,6 +81,7 @@ func (w *BashWorker) ProcessRequest(bashreq BashRequest) {
 	cmdres := exec.Command(command.program, command.prograparams...)
 	stdout, err := cmdres.Output()
 	if err != nil {
+		log.Printf("Command tried to execute: %s\n", bashreq.BashCommand)
 		log.Printf("Error executing the shell command: %s\n", err.Error())
 		return
 	}
